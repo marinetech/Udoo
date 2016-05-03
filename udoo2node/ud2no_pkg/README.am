@@ -1,0 +1,36 @@
+UDOO 2 node interface
+TCP socket (this make the tool language independent), UDOO sends some command and node responds.
+Node (server) listen at port 44444 for incoming connections, UDOO connect and starts querying the server.
+The server answer only when receives a command from client. Something like AT commands for modems.
+
+List of commands (still brainstorming) from UDOO to node
+1. set_proj_power,proj_id,pwr → set power of the projector proj_id (one or all)
+2. play_audio,name,starting_time,proj_id,n_rip,flag → play audio file n_rip times from starting_time via the projector  proj_id (one or all), flag to force sending also if recording
+3. send_file,name,size → send a file called name with size bytes from udoo to node
+After sending this command it sends a file via TCP
+4. record_audio,name,h_id,duration → record with hydrophone h_id (one or all) in audio file called name for duration hh-mm-ss, flag to force recording also if sending
+5. get_file,name,delete_flag → the node sends the specified file to the UDOO in the same way of command 3): the node sends a file using the way described in 3). If it doesn’t have the file or if the file is open it sends 2 different error messages. The flag specify if erase it (1) or not (0)
+6. get_data,remove_flag → the node sends all the recorded data, removing it according to the flag
+7. get_status → the udoo asks the node status (ON-OFF,battery,hydrophones_flag_list, projector_flag_list,free_memory%) flag will be a number that says if idle/busy/broken,..
+8. reset_proj,id,flag → reset projector status, flag to force the reset also when transmitting
+9. reset_hyd,id,flag→ reset hydrophone status, flag to force the reset also when recording
+10. reset_all,flag → reset status, flag to force the reset also when operation going
+11. delete_all_rec → delete all the recorded files
+12. delete_all_sent → delete all the sending files
+13. get_real_time_h,h_id,starting_time,duration,chunck_duration,delete_flag → record and send data to udoo with hydrophone h_id (one or all) in audio file long chunck_duration seconds, called with the recorded unixtime for a total duration hh-mm-ss, flag to delete the data once sent (true (1) by default), flag to force recording also if sending (false (0) by default)
+
+NOTE0: At each command the node answers either with the results of the command, if any, or with OK or ERROR_CODE### to confirm or signal an error
+
+NOTE1: we should find a way with proj_id and h_id to set the list of devices to employ
+SOLUTION: the same of linux chmod → group the devices in bit fashion: 
+0 : none
+1 : dev1
+2->10 : dev 2
+3 -> 11: dev 1 and 2
+4 -> 100: dev 3
+and so on
+
+NOTE2: by default either sending or recording. Therefore the flag in 2, 4 and 13 is
+0: default: if trying to transmit while recording, not allowed (error feedback)
+1: force: if trying to transmit while recording, stop recording and transmit
+2: both: if trying to transmit while recording, do it together
