@@ -264,7 +264,9 @@ class Interpreter(object):
         """
         cum_id = 0
         for id_i in ID_list:
-            cum_id += pow(2,id_i)
+            if id_i <= 0:
+                raise ValueError("each ID must be > 0")
+            cum_id += pow(2,id_i-1)
         return cum_id
         
     def getIDlist(self,cum_id):
@@ -277,7 +279,7 @@ class Interpreter(object):
         while (cum_id > 0):
             ID = int(math.log(cum_id,2))
             cum_id -= pow(2,ID)
-            ID_list.insert(0,ID)
+            ID_list.insert(0,ID+1)
         return ID_list
 
 
