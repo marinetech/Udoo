@@ -45,6 +45,7 @@ class Modem(object):
         self.conn.connect()
         self.m_to = m_to
         self.status = Modem.Status.IDLE
+        self.node_status = 0
         self.automatic = automatic
         self.interpreter = Interpreter()
         self.mainPID = os.getpid()
@@ -80,7 +81,7 @@ class Modem(object):
 
     def check4kill(self,threadPID = -1):
         """
-        Close the connection from the modem to the submerged node
+        Check if the process has to be killed
         @param self pointer to the class object
         """
         #TODO: check in the kill log if my main or my thred PID are there.
@@ -110,6 +111,13 @@ class Modem(object):
             f.close()
         except IOError:
             print kill_log + " not found"
+
+    def kill(self):
+        """
+        Status kill
+        @param self pointer to the class object
+        """
+        self.status = Modem.Status.KILL
         
     def close(self):
         """
@@ -242,7 +250,7 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
 
-    def setPower(self, ID_list, s_l):
+    def reqSetPower(self, ID_list, s_l):
         """
         Set the projector power. 
         @param self pointer to the class object
@@ -259,7 +267,7 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
         
-    def playProj(self, name, ID_list, starting_time, n_rip = 1, \
+    def reqPlayProj(self, name, ID_list, starting_time, n_rip = 1, \
                     delete = 1, force_flag = 0):
         """
         Transmit the file with the projector. 
@@ -285,7 +293,7 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
         
-    def recordAudio(self, name, ID_list, starting_time, duration, \
+    def reqRecordAudio(self, name, ID_list, starting_time, duration, \
                         force_flag = 0):
         """
         record via hydrophones. 
@@ -310,9 +318,9 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
 
-    def getNodeStatus(self):
+    def reqNodeStatus(self):
         """
-        Get the submerged node status. 
+        Require the submerged node status. 
         @param self pointer to the class object
         """
         if self.status != Modem.Status.IDLE:
@@ -321,12 +329,21 @@ class Modem(object):
         self.status = Modem.Status.BUSY2REQ
         self.send(self.interpreter.buildGetStatus())
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
-            res = self.recvCommand()
+            self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
-        return res
-        
-    def resetProj(self, ID_list, force_flag = 0):
+
+    def getNodeStatus(self,status = 0):
+        """
+        Get the submerged node status. 
+        @param status cointaining the status received from the node
+        @param self pointer to the class object
+        """
+        if status:
+            self.node_status = status
+        return self.node_status
+
+    def reqResetProj(self, ID_list, force_flag = 0):
         """
         Reset the projectors 
         @param self pointer to the class object
@@ -343,7 +360,7 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
     
-    def resetHydr(self, ID_list, force_flag = 0):
+    def reqResetHydr(self, ID_list, force_flag = 0):
         """
         Reset the hydrophones 
         @param self pointer to the class object
@@ -361,7 +378,7 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
     
-    def resetAll(self, force_flag = 0):
+    def reqResetAll(self, force_flag = 0):
         """
         Build the reset_all message. This message will reset the node 
         @param self pointer to the class object
@@ -378,7 +395,7 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
         
-    def deleteAllRec(self):
+    def reqDeleteAllRec(self):
         """
         Delete the recorded files from the node 
         @param self pointer to the class object
@@ -394,7 +411,7 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
         
-    def deleteAllSent(self):
+    def reqDeleteAllSent(self):
         """
         Delete the files sent by the node 
         @param self pointer to the class object
@@ -523,3 +540,4 @@ class Modem(object):
 if __name__ == "__main__":
     print("This is the modem class")
     
+#TODO: check status,x,y,z,w,k,..

@@ -3,6 +3,8 @@ TCP socket (this make the tool language independent), UDOO sends some command an
 Node (server) listen at port 44444 for incoming connections, UDOO connect and starts querying the server.
 The server answer only when receives a command from client. Something like AT commands for modems.
 
+TO USE THE ud2no_pkg PACKAGE, PLACE IT in  /usr/local/lib/python2.7/dist-packages/
+
 List of commands (still brainstorming) from UDOO to node
 1. set_proj_power,proj_id,pwr → set power of the projector proj_id (one or all)
 2. play_audio,name,starting_time,proj_id,n_rip,flag → play audio file n_rip times from starting_time via the projector  proj_id (one or all), flag to force sending also if recording
