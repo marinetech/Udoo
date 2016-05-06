@@ -7,7 +7,7 @@ the modem, to the submerged node.
 As parallel, signals coming from the hydrophones are passed through
 an FFT to allow discriminate them, prior to proper analysis.
 
-Copyright 2016 Signet Lab, University of Padova
+Copyright 2016 Signet Lab, University of Padova https://signet.dei.unipd.it
 License: GNU GPLv3 http://www.gnu.org/licenses/gpl.html
 """
 
@@ -20,7 +20,7 @@ import wave
 
 
 class Signal(object):
-    """ Class that defines a signal according to specifics.
+    """ Class that defines a signal according to specs.
   
     This class is just a container for parameters of the
     signal. The creation of signal samples is postponed as
@@ -68,7 +68,7 @@ class Wave(object):
 
 
 class Chirp(Signal):
-    """Class that defines a Chirp according to specifics.
+    """Class that defines a Chirp according to specs.
 
     This class is just a container for parameters as 
     the writing down is delayed as much as possible.
@@ -98,7 +98,7 @@ class Chirp(Signal):
         return signal.chirp(ts, self.startf, self.t1, self.stopf, self.method)
 
 class Sine(Signal):
-    """Class that defines a Sine according to specifics.
+    """Class that defines a Sine according to specs.
 
     This class is just a container for parameters as 
     the writing down is delayed as much as possible.
@@ -127,10 +127,42 @@ class Sine(Signal):
         ts =  np.asarray(tsamples)
         phases = 2*math.pi * self.freq * ts + self.offset
         return self.amp * np.sin(phases)
-            
 
 
-def writeToWAV(waves, filename, framerate=44100, resolution=2, n_channels=1): 
+class Rect(Signal):            
+    """Class that defines a train of Rects according to specs.
+
+    This class is just a container for parameters as 
+    the writing down is delayed as much as possible.
+    The actual waveform samples are obtained by making 
+    a Wave object from the Signal object handling it.
+    """
+    
+    def __init__(self, duty_cycle=0.5, period=0.1, amplitude=1, offset=0):
+        """Initialize a Sin signal.
+
+        duty_cycle: double ratio of pulse duration to period
+        period: double distance between repetion of rects
+        amplitude: double amplitude in Volts
+        offset: double initial shift of the waveform
+        """
+        self.duty_cycle = duty_cycle
+        self.period = period
+        self.amplitude = amplitude
+
+    def evaluate(self, tsamples):
+        """Evaluates the signal at the given time instants.
+
+        tsamples: ndarray time samples
+        
+        returns: float ndarray
+        """
+        ts =  np.asarray(tsamples)
+        pulse_d = duty_cycle * period
+        return self.amp * ((ts + offset) % period < pulse_d)
+
+
+def writeToWAV(waves, filename, framerate=96000, resolution=2, n_channels=1): 
     """Method that creates a WAV file from the Waves objects it gets as input.
 
     waves: list with all signals that will go in the WAV file
