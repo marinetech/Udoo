@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import math
 from scipy import signal
 import wave
+import os
 
 
 class Signal(object):
@@ -50,7 +51,7 @@ class Signal(object):
 class Wave(object):
     """Represents a discrete-time waveform to be written to a file."""
 
-    def __init__(self, samples, times, samplerate):
+    def __init__(self, samples, times=None, samplerate=None):
         """Creates a Wave object.
 
         samples: ndarray double
@@ -62,8 +63,16 @@ class Wave(object):
             return         
    
         self.samples = samples
-        self.time_s = times
-        self.samplerate = samplerate
+        if samplerate != None:
+            self.samplerate = samplerate
+        else:
+            self.samplerate = 96000
+
+        if times is None:
+            self.time_s = np.arange(len(samples)) / self.framerate
+        else:
+            self.time_s = np.asanyarray(times)
+
         self.n_samples = samples.size
 
 
@@ -162,13 +171,69 @@ class Rect(Signal):
         return self.amp * ((ts + offset) % period < pulse_d)
 
 
-def writeToWAV(waves, filename, framerate=96000, resolution=2, n_channels=1): 
+class Recording(object):
+    """ Class  that handles wav files and does an initial analysis.
+
+    Initial discrimination of signal is done by calculating the 
+    spectrum of a portion of it and by by trsholding it.
+    """
+
+    def __init__(self, start_f=18000, stop_f=34000, th=1):
+        """ Object holding data relative to file being read.
+
+        start_f double starting frquency of the band of interest
+        stop_f double stop frequency of the band of interest
+        th: treshold on the power of the spectrum
+        """
+        self.start_f = start_f 
+        self.stop_f = stop_f 
+        self.treshold = th
+
+
+    def analyze(self, filename):
+        """Parse recordings through spectrogram
+
+        This method makes the FFT of the file filename and treshold it.
+        If the file pass the teshold test it is marked as 'sendable',
+        otherwise it is discarded.
+
+        filename string with, guess... the filename!
+        """
+        rfile = wave.open(filename, 'r')
+
+        params = rfile.getparams()
+        #getparams output: [nchann, sampwidth, framerate, nframes, ctype, cname]
+     
+        # check channels
+        if params[0] > 1:
+            print "More than one audio channel"
+            sys.exit(0)
+         
+        # check sample width
+        datawidth = 'Int' + str(params[1]*8)
+         
+        # extract samples
+        rstring = rfile.readframes(-1)
+        rsamples = np.fromstring(rstring, datawidth)
+
+        # FFT
+        rsamplesFFT = np.fft.fft(rsamples)
+
+        rsamplespower = np.linalg.norm(rsamplesFFT, 2)
+ 
+        if rsamplespower < self.treshold:
+            os.remove("filename")
+            return 1
+        else:
+            return 0
+        
+
+def writeToWAV(waves, filename, framerate=96000, resolution=2): 
     """Method that creates a WAV file from the Waves objects it gets as input.
 
     waves: list with all signals that will go in the WAV file
     filename: string containing the filename
     resolution: integer number of bytes encoding a sample
-    n_channels: integer number of channels (1 or 2)
     """
 
     # find out hw many you need and collect samples
@@ -187,7 +252,7 @@ def writeToWAV(waves, filename, framerate=96000, resolution=2, n_channels=1):
     # open file to write
     wfile = wave.open(filename, 'w')
     
-    wfile.setnchannels(n_channels)
+    wfile.setnchannels(1)
     wfile.setframerate(framerate)
     wfile.setsampwidth(resolution)
 

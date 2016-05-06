@@ -2,8 +2,12 @@
 # them, one after tho other, to a single WAV file
 
 import scipy as sp
-import numoy as np
+import numpy as np
 import THEMOSignal as TS
+
+
+
+### Generation part
 
 # define parameters
 SAMP_FREQ = 96000 # Hz
@@ -23,3 +27,12 @@ wavelist = [wave1, wave2]
 
 # write a WAV file at sampling frequency 96 kHz
 TS.writeToWAV(wavelist, FILENAME, SAMP_FREQ)
+
+
+
+
+### Recording part
+
+rec1 = TS.Recording(18000, 34000, 1)
+
+state = rec1.analyze("sound.wav")

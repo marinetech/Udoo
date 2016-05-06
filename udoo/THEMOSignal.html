@@ -30,11 +30,12 @@ License:&nbsp;GNU&nbsp;GPLv3&nbsp;<a href="http://www.gnu.org/licenses/gpl.html"
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="math.html">math</a><br>
 <a href="numpy.html">numpy</a><br>
-</td><td width="25%" valign=top><a href="matplotlib.pyplot.html">matplotlib.pyplot</a><br>
-<a href="scipy.signal.html">scipy.signal</a><br>
-</td><td width="25%" valign=top><a href="scipy.html">scipy</a><br>
-<a href="wave.html">wave</a><br>
-</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+</td><td width="25%" valign=top><a href="os.html">os</a><br>
+<a href="matplotlib.pyplot.html">matplotlib.pyplot</a><br>
+</td><td width="25%" valign=top><a href="scipy.signal.html">scipy.signal</a><br>
+<a href="scipy.html">scipy</a><br>
+</td><td width="25%" valign=top><a href="wave.html">wave</a><br>
+</td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -45,7 +46,8 @@ License:&nbsp;GNU&nbsp;GPLv3&nbsp;<a href="http://www.gnu.org/licenses/gpl.html"
 <dt><font face="helvetica, arial"><a href="__builtin__.html#object">__builtin__.object</a>
 </font></dt><dd>
 <dl>
-<dt><font face="helvetica, arial"><a href="THEMOSignal.html#Signal">Signal</a>
+<dt><font face="helvetica, arial"><a href="THEMOSignal.html#Recording">Recording</a>
+</font></dt><dt><font face="helvetica, arial"><a href="THEMOSignal.html#Signal">Signal</a>
 </font></dt><dd>
 <dl>
 <dt><font face="helvetica, arial"><a href="THEMOSignal.html#Chirp">Chirp</a>
@@ -101,6 +103,41 @@ returns:&nbsp;<a href="#Wave">Wave</a>&nbsp;<a href="__builtin__.html#object">ob
 
 <hr>
 Data descriptors inherited from <a href="THEMOSignal.html#Signal">Signal</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Recording">class <strong>Recording</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Class&nbsp;&nbsp;that&nbsp;handles&nbsp;wav&nbsp;files&nbsp;and&nbsp;does&nbsp;an&nbsp;initial&nbsp;analysis.<br>
+&nbsp;<br>
+Initial&nbsp;discrimination&nbsp;of&nbsp;signal&nbsp;is&nbsp;done&nbsp;by&nbsp;calculating&nbsp;the&nbsp;<br>
+spectrum&nbsp;of&nbsp;a&nbsp;portion&nbsp;of&nbsp;it&nbsp;and&nbsp;by&nbsp;by&nbsp;trsholding&nbsp;it.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Recording-__init__"><strong>__init__</strong></a>(self, start_f<font color="#909090">=18000</font>, stop_f<font color="#909090">=34000</font>, th<font color="#909090">=1</font>)</dt><dd><tt>Object&nbsp;holding&nbsp;data&nbsp;relative&nbsp;to&nbsp;file&nbsp;being&nbsp;read.<br>
+&nbsp;<br>
+start_f&nbsp;double&nbsp;starting&nbsp;frquency&nbsp;of&nbsp;the&nbsp;band&nbsp;of&nbsp;interest<br>
+stop_f&nbsp;double&nbsp;stop&nbsp;frequency&nbsp;of&nbsp;the&nbsp;band&nbsp;of&nbsp;interest<br>
+th:&nbsp;treshold&nbsp;on&nbsp;the&nbsp;power&nbsp;of&nbsp;the&nbsp;spectrum</tt></dd></dl>
+
+<dl><dt><a name="Recording-analyze"><strong>analyze</strong></a>(self, filename)</dt><dd><tt>Parse&nbsp;recordings&nbsp;through&nbsp;spectrogram<br>
+&nbsp;<br>
+This&nbsp;method&nbsp;makes&nbsp;the&nbsp;FFT&nbsp;of&nbsp;the&nbsp;file&nbsp;filename&nbsp;and&nbsp;treshold&nbsp;it.<br>
+If&nbsp;the&nbsp;file&nbsp;pass&nbsp;the&nbsp;teshold&nbsp;test&nbsp;it&nbsp;is&nbsp;marked&nbsp;as&nbsp;'sendable',<br>
+otherwise&nbsp;it&nbsp;is&nbsp;discarded.<br>
+&nbsp;<br>
+filename&nbsp;string&nbsp;with,&nbsp;guess...&nbsp;the&nbsp;filename!</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
 <dl><dt><strong>__dict__</strong></dt>
 <dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
@@ -252,7 +289,7 @@ Data descriptors inherited from <a href="THEMOSignal.html#Signal">Signal</a>:<br
 <td colspan=2><tt>Represents&nbsp;a&nbsp;discrete-time&nbsp;waveform&nbsp;to&nbsp;be&nbsp;written&nbsp;to&nbsp;a&nbsp;file.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="Wave-__init__"><strong>__init__</strong></a>(self, samples, times, samplerate)</dt><dd><tt>Creates&nbsp;a&nbsp;<a href="#Wave">Wave</a>&nbsp;<a href="__builtin__.html#object">object</a>.<br>
+<dl><dt><a name="Wave-__init__"><strong>__init__</strong></a>(self, samples, times<font color="#909090">=None</font>, samplerate<font color="#909090">=None</font>)</dt><dd><tt>Creates&nbsp;a&nbsp;<a href="#Wave">Wave</a>&nbsp;<a href="__builtin__.html#object">object</a>.<br>
 &nbsp;<br>
 samples:&nbsp;ndarray&nbsp;double<br>
 time_s:&nbsp;ndarray&nbsp;double<br>
@@ -273,11 +310,10 @@ Data descriptors defined here:<br>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
     
 <tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt><a name="-writeToWAV"><strong>writeToWAV</strong></a>(waves, filename, framerate<font color="#909090">=96000</font>, resolution<font color="#909090">=2</font>, n_channels<font color="#909090">=1</font>)</dt><dd><tt>Method&nbsp;that&nbsp;creates&nbsp;a&nbsp;WAV&nbsp;file&nbsp;from&nbsp;the&nbsp;Waves&nbsp;objects&nbsp;it&nbsp;gets&nbsp;as&nbsp;input.<br>
+<td width="100%"><dl><dt><a name="-writeToWAV"><strong>writeToWAV</strong></a>(waves, filename, framerate<font color="#909090">=96000</font>, resolution<font color="#909090">=2</font>)</dt><dd><tt>Method&nbsp;that&nbsp;creates&nbsp;a&nbsp;WAV&nbsp;file&nbsp;from&nbsp;the&nbsp;Waves&nbsp;objects&nbsp;it&nbsp;gets&nbsp;as&nbsp;input.<br>
 &nbsp;<br>
 waves:&nbsp;list&nbsp;with&nbsp;all&nbsp;signals&nbsp;that&nbsp;will&nbsp;go&nbsp;in&nbsp;the&nbsp;WAV&nbsp;file<br>
 filename:&nbsp;string&nbsp;containing&nbsp;the&nbsp;filename<br>
-resolution:&nbsp;integer&nbsp;number&nbsp;of&nbsp;bytes&nbsp;encoding&nbsp;a&nbsp;sample<br>
-n_channels:&nbsp;integer&nbsp;number&nbsp;of&nbsp;channels&nbsp;(1&nbsp;or&nbsp;2)</tt></dd></dl>
+resolution:&nbsp;integer&nbsp;number&nbsp;of&nbsp;bytes&nbsp;encoding&nbsp;a&nbsp;sample</tt></dd></dl>
 </td></tr></table>
 </body></html>
