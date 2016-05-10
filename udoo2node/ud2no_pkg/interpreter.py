@@ -67,7 +67,7 @@ class Interpreter(object):
             print msg
         return msg
         
-    def buildGetHydData(self, name, delete = 1):
+    def buildGetFile(self, name, delete = 1):
         """
         Build the get_file message. 
         @param self pointer to the class object
@@ -132,13 +132,17 @@ class Interpreter(object):
             print msg
         return msg
         
-    def buildRecordAudio(self, name, ID_list, starting_time, duration, \
+    def buildRecordData(self, name, sens_t, ID_list, starting_time, duration, \
                         force_flag = 0):
         """
-        Build the record_audio message. 
+        Build the record_data message. 
         @param self pointer to the class object
         @param name of the file where to record the audio
-        @param ID_list list of the projector IDs used to record the audio
+        @param sens_t of the sensors that have to record the data:
+            1 --> hydrophone, 
+            2 --> camera 
+            3 --> others
+        @param ID_list list of the sensors IDs used to record the audio
         @param starting_time HH:MM:SS when to start recording the file
         @param duration HH:MM:SS of duration of the recording
         @param force_flag if trying to record while transmitting:
@@ -148,19 +152,23 @@ class Interpreter(object):
         @return the message
         """
         cum_id = self.getCumulativeID(ID_list)
-        msg = self.start() + "record_audio" + self.s() + str(name) + self.s() + str(cum_id) + \
-            self.s() + str(starting_time) + self.s() + str(duration) + self.s() + \
-            str(force_flag) + self.end()
+        msg = self.start() + "record_data" + self.s() + str(name) + str(sens_t) + \
+            self.s() + self.s() + str(cum_id) + self.s() + str(starting_time) + \
+            self.s() + str(duration) + self.s() + str(force_flag) + self.end()
         if self.debug :
             print msg
         return msg
 
-    def buildGetRTHydro(self, ID_list, starting_time, duration, chunck_duration, \
+    def buildGetRTData(self, sens_t, ID_list, starting_time, duration, chunck_duration, \
         delete = 1, force_flag = 0):
         """
-        Build the get_real_time_h message. 
+        Build the get_rt_data message. 
         @param self pointer to the class object
         @param ID_list list of the projector IDs used to record the audio
+        @param sens_t of the sensors that have to record the data:
+            1 --> hydrophone, 
+            2 --> camera 
+            3 --> others
         @param starting_time HH:MM:SS when to start recording the file
         @param duration HH:MM:SS of duration of the recording
         @param chunck_duration chunk duration, in seconds
@@ -172,9 +180,9 @@ class Interpreter(object):
         @return the message
         """
         cum_id = self.getCumulativeID(ID_list)
-        msg = self.start() + "get_real_time_h" + self.s() + str(cum_id) + self.s() + \
-            str(starting_time) + self.s() + str(duration)+ self.s() + \
-            str(chunck_duration)+ self.s() + str(delete) + self.end()
+        msg = self.start() + "get_rt_data" + self.s() + str(sens_t) + self.s() + \
+            str(cum_id) + self.s() + str(starting_time) + self.s() + str(duration)+ \
+            self.s() + str(chunck_duration)+ self.s() + str(delete) + self.end()
         if self.debug :
             print msg
         return msg
@@ -205,17 +213,21 @@ class Interpreter(object):
             print msg
         return msg
     
-    def buildResetHydr(self, ID_list, force_flag = 0):
+    def buildResetSensor(self, sens_t, ID_list, force_flag = 0):
         """
-        Build the reset_hyd message. This message will reset the hydrophones 
+        Build the reset_sen message. This message will reset the sensors 
         @param self pointer to the class object
+        @param sens_t of the sensors that have to record the data:
+            1 --> hydrophone, 
+            2 --> camera 
+            3 --> others
         @param ID_list list of the projector IDs that has to be resetted
         @param force_flag if 1 reset also if pending operations, if 0 not 
         @return the message
         """
         cum_id = self.getCumulativeID(ID_list)
-        msg = self.start() + "reset_hyd" + self.s() + str(cum_id) + self.s() + \
-            str(force_flag) + self.end()
+        msg = self.start() + "reset_sen" + self.s() + str(sens_t) + self.s() \
+            + str(cum_id) + self.s() + str(force_flag) + self.end()
         if self.debug :
             print msg
         return msg
