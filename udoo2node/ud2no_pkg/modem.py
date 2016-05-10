@@ -16,11 +16,13 @@ class Modem(object):
     
     class ErrorDict:
         """Internal class to map the error sens_ts to their error message"""
-        NONE, SYNT_ERR, FILE_NOT_FOUND, TX_WHILE_RX, RX_WHILE_TX = \
-        range(5)
+        NONE, SYNT_ERR, WRONG_SETTING, NOT_RESPONDING, FILE_NOT_FOUND, \
+        TX_WHILE_RX, RX_WHILE_TX = range(7)
         error_dict = {
             NONE : 'none',
             SYNT_ERR : 'command syntax error',
+            WRONG_SETTING : 'wrong setting, value not allowed',
+            NOT_RESPONDING : 'device not responding, check the status',
             FILE_NOT_FOUND : 'file not found error',
             TX_WHILE_RX : 'you attempt to transmit while receiving, if \
                 you really want, set the force flag to 1',

@@ -152,9 +152,10 @@ class Interpreter(object):
         @return the message
         """
         cum_id = self.getCumulativeID(ID_list)
-        msg = self.start() + "record_data" + self.s() + str(name) + str(sens_t) + \
-            self.s() + self.s() + str(cum_id) + self.s() + str(starting_time) + \
-            self.s() + str(duration) + self.s() + str(force_flag) + self.end()
+        msg = self.start() + "record_data" + self.s() + str(name) + self.s() + \
+            str(sens_t) + self.s() + str(cum_id) + self.s() + \
+            str(starting_time) + self.s() + str(duration) + self.s() + \
+            str(force_flag) + self.end()
         if self.debug :
             print msg
         return msg
@@ -164,7 +165,7 @@ class Interpreter(object):
         """
         Build the get_rt_data message. 
         @param self pointer to the class object
-        @param ID_list list of the projector IDs used to record the audio
+        @param ID_list list of the sensors IDs used to record the audio
         @param sens_t of the sensors that have to record the data:
             1 --> hydrophone, 
             2 --> camera 
