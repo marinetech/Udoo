@@ -244,14 +244,19 @@ class Interpreter(object):
             print msg
         return msg
         
-    def buildDeleteAllRec(self):
+    def buildDeleteAllRec(self, sens_t):
         """
         Build the delete_all_rec message. This message delete the recorded 
         files at the node 
         @param self pointer to the class object
+        @param sens_t of the sensors that have to record the data:
+            o --> all,
+            1 --> hydrophone, 
+            2 --> camera 
+            3 --> others
         @return the message
         """
-        msg = "delete_all_rec"
+        msg = "delete_all_rec" + self.s() + str(sens_t)
         if self.debug :
             print msg
         return msg

@@ -174,7 +174,7 @@ class Modem(object):
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem sendDataFile unexpected status: \
                 " + str(self.status))
-        if ! os.path.isfile(file_path):
+        if not os.path.isfile(file_path):
             raise FileNotFoundError("Modem sendDataFile file does not \
                 exist: " + file_path)
 
@@ -212,7 +212,7 @@ class Modem(object):
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
-        return errorCheck()
+        return self.errorCheck()
        
     def reqAllData(self, delete_flag = 1):
         """
@@ -229,7 +229,7 @@ class Modem(object):
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
-        return errorCheck()
+        return self.errorCheck()
     
     def reqRTData(self, ID_list, starting_time, duration, \
         chunck_duration = 1, delete = 1, force_flag = 0):
@@ -256,7 +256,7 @@ class Modem(object):
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
-        return errorCheck()
+        return self.errorCheck()
 
     def reqSetPower(self, ID_list, s_l):
         """
@@ -274,7 +274,7 @@ class Modem(object):
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
-        return errorCheck()
+        return self.errorCheck()
         
     def reqPlayProj(self, name, ID_list, starting_time, n_rip = 1, \
                     delete = 1, force_flag = 0):
@@ -301,7 +301,7 @@ class Modem(object):
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
-        return errorCheck()
+        return self.errorCheck()
         
     def reqRecordData(self, name, sens_t, ID_list, starting_time, duration, \
                         force_flag = 0):
@@ -325,13 +325,13 @@ class Modem(object):
             raise ValueError("Modem recordAudio unexpected status:\
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
-        self.send(self.interpreter.buildRecordData(name, ID_list, \
+        self.send(self.interpreter.buildRecordData(name, sens_t, ID_list, \
             starting_time, duration, force_flag))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
-        return errorCheck()
+        return self.errorCheck()
 
     def reqNodeStatus(self):
         """
@@ -347,7 +347,7 @@ class Modem(object):
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
-        return errorCheck()
+        return self.errorCheck()
 
     def getNodeStatus(self,status = 0):
         """
@@ -375,7 +375,7 @@ class Modem(object):
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
-        return errorCheck()
+        return self.errorCheck()
     
     def reqResetSensors(self, sens_t, ID_list, force_flag = 0):
         """
@@ -394,12 +394,12 @@ class Modem(object):
             raise ValueError("Modem reqResetSensor unexpected status: \
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
-        self.send(self.interpreter.buildResetSensor(ID_list, force_flag))
+        self.send(self.interpreter.buildResetSensor(sens_t, ID_list, force_flag))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
-        return errorCheck()
+        return self.errorCheck()
     
     def reqResetAll(self, force_flag = 0):
         """
@@ -417,7 +417,7 @@ class Modem(object):
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
-        return errorCheck()
+        return self.errorCheck()
         
     def reqDeleteAllRec(self, sens_t = 0):
         """
@@ -434,12 +434,12 @@ class Modem(object):
             raise ValueError("Modem deleteAllRec unexpected status: \
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
-        self.send(self.interpreter.buildDeleteAllRec())
+        self.send(self.interpreter.buildDeleteAllRec(sens_t))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
-        return errorCheck()
+        return self.errorCheck()
         
     def reqDeleteAllSent(self):
         """
@@ -456,7 +456,7 @@ class Modem(object):
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
-        return errorCheck()
+        return self.errorCheck()
 
     def recvDataFile(self, file_name, length_f, confirm_flag):
         """
@@ -494,7 +494,7 @@ class Modem(object):
             self.status = Modem.Status.IDLE
         elif self.status == Modem.Status.BUSY2REQ2DATA:
             self.status = Modem.Status.BUSY2REQ
-        return errorCheck()
+        return self.errorCheck()
        
     def confirmedMyIstr(self):
         """
