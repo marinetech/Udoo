@@ -33,12 +33,20 @@
 
 # UDOO DAEMON
 COMMON_LOG=/var/log/check_status
-port=44444
+port=55555
 rm $COMMON_LOG/check_off.log > /dev/null
 while true
 do
 	pc104_message=$(nc -l -p $port)
-	echo $pc104_message	
+	echo $pc104_message
+
+	#if getStatus
+	getStatus_flag=$(echo $pc104_message | grep getStatus)
+	if [ -n "$getStatus_flag" ]
+	then
+		echo "ON" | nc -l -p $port
+	fi
+
 	# set date if date
 	pc104_date=$(echo $pc104_message | grep set_date | awk -F "," '{print $2}')
 	if [ -n "$pc104_date" ]
@@ -46,6 +54,7 @@ do
 		sudo date +%s.%N -s @$pc104_date
 	fi
 
+  # upload
 	upload_flag=$(echo $pc104_message | grep upload)
 	if [ -n "$upload_flag" ]
 	then
@@ -53,10 +62,23 @@ do
 		sleep 1
 	fi
 
+	# remove all
 	erase_flag=$(echo $pc104_message | grep remove_all)
 	if [ -n "$erase_flag" ]
 	then
 		remove_all_sent.sh
+		sleep 1
+	fi
+
+	#run bash script
+
+	run_file=$(echo $pc104_message | grep run_file | awk -F "," '{print $2}')
+	if [ -n "$run_file" ]
+	then
+	#TODO: TEST THIS
+		usr=$(echo $run_file | grep / | awk -F "/" '{print $1}')
+		chmod +x /home/$run_file
+		sudo -u $usr /home/$run_file
 		sleep 1
 	fi
 
