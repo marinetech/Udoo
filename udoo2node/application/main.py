@@ -3,9 +3,9 @@ import ud2no_pkg
 import os
 import time
 
-TCP_IP = "192.168.100.10"
+TCP_IP = "127.0.0.1"
 #TCP_IP = "localhost"
-TCP_PORT = 55555
+TCP_PORT = 44444
 BUFFER_SIZE = 32
 DATA_BUFFER_SIZE = 128
 
@@ -13,7 +13,7 @@ myPID = os.getpid()
 print "HI ", myPID, "!!"
 print("Hello")
 bridge = ud2no_pkg.Modem(TCP_IP,TCP_PORT,True,BUFFER_SIZE,DATA_BUFFER_SIZE)
-try:    
+try:
     print("Connected")
     file_path = "ciccio"
     #bridge.sendDataFile(file_path)
@@ -28,7 +28,7 @@ try:
     bridge.reqResetHydr([1,4])
     bridge.reqResetAll()
     bridge.reqDeleteAllRec()
-    bridge.reqDeleteAllSent()    
+    bridge.reqDeleteAllSent()
     time.sleep(1)
     bridge.recvCommand()
     bridge.recvCommand()
@@ -44,4 +44,3 @@ try:
 finally:
     print >>sys.stderr, 'closing socket'
     bridge.close()
-         
