@@ -11,16 +11,18 @@ class Modem(object):
     """Class modem to control the node via TCP"""
     
     class Status:
-        """Internal class where the status types are defined"""
+        """Internal class where the status sens_ts are defined"""
         IDLE, BUSY2REQ, BUSY2DATA, BUSY2RECV, BUSY2REQ2DATA, KILL = range(6)
     
     class ErrorDict:
-        """Internal class to map the error types to their error message"""
-        NONE, SYNT_ERR, FILE_NOT_FOUND, TX_WHILE_RX, RX_WHILE_TX = \
-        range(5)
+        """Internal class to map the error sens_ts to their error message"""
+        NONE, SYNT_ERR, WRONG_SETTING, NOT_RESPONDING, FILE_NOT_FOUND, \
+        TX_WHILE_RX, RX_WHILE_TX = range(7)
         error_dict = {
             NONE : 'none',
             SYNT_ERR : 'command syntax error',
+            WRONG_SETTING : 'wrong setting, value not allowed',
+            NOT_RESPONDING : 'device not responding, check the status',
             FILE_NOT_FOUND : 'file not found error',
             TX_WHILE_RX : 'you attempt to transmit while receiving, if \
                 you really want, set the force flag to 1',
@@ -49,6 +51,7 @@ class Modem(object):
         self.automatic = automatic
         self.interpreter = Interpreter()
         self.mainPID = os.getpid()
+        self.error_status = Modem.ErrorDict.NONE
         if automatic:
             thread.start_new_thread(self.run,())
         
@@ -166,13 +169,17 @@ class Modem(object):
 
     def sendDataFile(self, file_path):
         """
-        Send a file to the submerged node
+        Send a file to the submerged node. It may raise an exception.
         @param self pointer to the class object
         @param file_path path of the file that has to be sent
         """
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem sendDataFile unexpected status: \
                 " + str(self.status))
+        if not os.path.isfile(file_path):
+            raise FileNotFoundError("Modem sendDataFile file does not \
+                exist: " + file_path)
+
         self.status = Modem.Status.BUSY2REQ
         name = os.path.basename(file_path)
         size = os.path.getsize(file_path)
@@ -191,7 +198,7 @@ class Modem(object):
         f.close()
         self.status = Modem.Status.IDLE
        
-    def reqHydData(self, file_name, delete_flag = 1):
+    def reqDataFile(self, file_name, delete_flag = 1):
         """
         Require a file from the submerged node
         @param self pointer to the class object
@@ -199,23 +206,24 @@ class Modem(object):
         @param delete_flag, if 1 erase it after sending, if 0 not
         """
         if self.status != Modem.Status.IDLE:
-            raise ValueError("Modem reqHydData unexpected status: \
+            raise ValueError("Modem reqDataFile unexpected status: \
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
-        self.send(self.interpreter.buildGetHydData(file_name, delete_flag))
+        self.send(self.interpreter.buildGetFile(file_name, delete_flag))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
+        return self.errorCheck()
        
-    def reqAllHydData(self, delete_flag = 1):
+    def reqAllData(self, delete_flag = 1):
         """
         Require all the data from the submerged node
         @param self pointer to the class object
         @param delete_flag, if 1 erase it after sending, if 0 not
         """
         if self.status != Modem.Status.IDLE:
-            raise ValueError("Modem reqAllHydData unexpected status: \
+            raise ValueError("Modem reqAllData unexpected status: \
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
         self.send(self.interpreter.buildGetData(delete_flag))
@@ -223,6 +231,7 @@ class Modem(object):
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
+        return self.errorCheck()
     
     def reqRTData(self, ID_list, starting_time, duration, \
         chunck_duration = 1, delete = 1, force_flag = 0):
@@ -243,12 +252,13 @@ class Modem(object):
             raise ValueError("Modem reqRTData unexpected status: \
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
-        self.send(self.interpreter.buildGetRTHydro(ID_list, starting_time, \
+        self.send(self.interpreter.buildGetRTData(ID_list, starting_time, \
             duration, chunck_duration, delete , force_flag))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
+        return self.errorCheck()
 
     def reqSetPower(self, ID_list, s_l):
         """
@@ -266,6 +276,7 @@ class Modem(object):
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
+        return self.errorCheck()
         
     def reqPlayProj(self, name, ID_list, starting_time, n_rip = 1, \
                     delete = 1, force_flag = 0):
@@ -292,13 +303,18 @@ class Modem(object):
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
+        return self.errorCheck()
         
-    def reqRecordAudio(self, name, ID_list, starting_time, duration, \
+    def reqRecordData(self, name, sens_t, ID_list, starting_time, duration, \
                         force_flag = 0):
         """
-        record via hydrophones. 
+        record via sensors (either hydrophones, camera or others). 
         @param self pointer to the class object
         @param name of the file where to record the audio
+        @param sens_t of the sensors that have to record the data:
+            0 --> hydrophone, 
+            1 --> camera 
+            2 --> others
         @param ID_list list of the projector IDs used to record the audio
         @param starting_time HH:MM:SS when to start recording the file
         @param duration HH:MM:SS of duration of the recording
@@ -311,12 +327,13 @@ class Modem(object):
             raise ValueError("Modem recordAudio unexpected status:\
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
-        self.send(self.interpreter.buildRecordAudio(name, ID_list, \
+        self.send(self.interpreter.buildRecordData(name, sens_t, ID_list, \
             starting_time, duration, force_flag))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
+        return self.errorCheck()
 
     def reqNodeStatus(self):
         """
@@ -332,6 +349,7 @@ class Modem(object):
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
+        return self.errorCheck()
 
     def getNodeStatus(self,status = 0):
         """
@@ -359,24 +377,31 @@ class Modem(object):
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
+        return self.errorCheck()
     
-    def reqResetHydr(self, ID_list, force_flag = 0):
+    def reqResetSensors(self, sens_t, ID_list, force_flag = 0):
         """
-        Reset the hydrophones 
+        Reset the sensors (either hydrophones, camera or other) 
         @param self pointer to the class object
+        @param sens_t of the sensors that have to be reset:
+            0 --> all
+            1 --> hydrophone, 
+            2 --> camera 
+            3 --> others
         @param ID_list list of the projector IDs that has to be resetted
         @param force_flag if 1 reset also if pending operations, if 0 not 
         @return the message
         """
         if self.status != Modem.Status.IDLE:
-            raise ValueError("Modem resetHydr unexpected status: \
+            raise ValueError("Modem reqResetSensor unexpected status: \
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
-        self.send(self.interpreter.buildResetHydr(ID_list, force_flag))
+        self.send(self.interpreter.buildResetSensor(sens_t, ID_list, force_flag))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
+        return self.errorCheck()
     
     def reqResetAll(self, force_flag = 0):
         """
@@ -394,22 +419,29 @@ class Modem(object):
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
+        return self.errorCheck()
         
-    def reqDeleteAllRec(self):
+    def reqDeleteAllRec(self, sens_t = 0):
         """
         Delete the recorded files from the node 
         @param self pointer to the class object
+        @param sens_t of the sensors that have the data to be deleted:
+            0 --> all 
+            1 --> hydrophone, 
+            2 --> camera 
+            3 --> others
         @return the message
         """
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem deleteAllRec unexpected status: \
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
-        self.send(self.interpreter.buildDeleteAllRec())
+        self.send(self.interpreter.buildDeleteAllRec(sens_t))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
+        return self.errorCheck()
         
     def reqDeleteAllSent(self):
         """
@@ -426,6 +458,7 @@ class Modem(object):
             self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
+        return self.errorCheck()
 
     def recvDataFile(self, file_name, length_f, confirm_flag):
         """
@@ -463,6 +496,7 @@ class Modem(object):
             self.status = Modem.Status.IDLE
         elif self.status == Modem.Status.BUSY2REQ2DATA:
             self.status = Modem.Status.BUSY2REQ
+        return self.errorCheck()
        
     def confirmedMyIstr(self):
         """
@@ -470,6 +504,7 @@ class Modem(object):
         @param self pointer to the class object
         """
         self.status = Modem.Status.IDLE
+        self.error_status = Modem.ErrorDict.NONE
        
     def error(self, err_id):
         """
@@ -478,8 +513,20 @@ class Modem(object):
         @param err_id error identifier
         """
         print >>sys.stderr, 'AN ERROR OCCURS: %s' % Modem.ErrorDict.error_dict[err_id]
+        self.error_status = err_id
         self.status = Modem.Status.IDLE
-        
+
+    def errorCheck(self, refresh_error = True):
+        """
+        Check if the node signal an error and return to the user
+        @param self pointer to the class object
+        @param refresh_error: if True refresh the error status
+        """
+        error = self.error_status
+        if refresh_error:
+            self.error_status = Modem.ErrorDict.NONE
+        return error
+
     def reset_myself(self):
         """
         Reset the modem status due to unexpected behavior
@@ -487,6 +534,8 @@ class Modem(object):
         """
         print >>sys.stderr, 'UNEXPECTED VALUE'
         self.status = Modem.Status.IDLE
+        self.error_status = Modem.ErrorDict.NONE
+
 
     # def parseDivCommands(self, msg):
     #     """

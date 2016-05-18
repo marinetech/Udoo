@@ -108,7 +108,7 @@ class Connector(object):
         @param self pointer to the class object 
         @return the data
         """        
-        while(self.status == Connector.Status.BUSY):
+        while(self.status != Connector.Status.IDLE):
             time.sleep(self.to)
         self.status = Connector.Status.BUSY
         data = self.sock.recv(self.data_buf_size)
@@ -120,7 +120,7 @@ class Connector(object):
         Send data to the socket.
         @param self pointer to the class object 
         """
-        while(self.status == Connector.Status.BUSY):
+        while(self.status != Connector.Status.IDLE):
             time.sleep(self.to)
         self.status = Connector.Status.BUSY
         self.sock.sendall(msg)
