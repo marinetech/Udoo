@@ -83,5 +83,3 @@ NOTE3: by default either sending or recording. Therefore the flag in the command
 0: default: if trying to transmit while recording, not allowed (error feedback)
 1: force: if trying to transmit while recording, stop recording and transmit
 2: both: if trying to transmit while recording, do it together
-
-List of the messages:
