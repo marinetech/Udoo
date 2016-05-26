@@ -3,7 +3,7 @@
 
 import scipy as sp
 import numpy as np
-import THEMOSignal as TS
+import themosignal as ts
 import wave
 import random
 
@@ -50,9 +50,9 @@ wfile.close()
 
 
 ## Generate a chirp signal passing from 50 to 100 Hz in 1 second
-sig1 = TS.Chirp(50, 100, 1)
+sig1 = ts.Chirp(50, 100, 1)
 # Generate a sine tone at 100 Hz frequency
-sig2 = TS.Sine(100)
+sig2 = ts.Sine(100)
 
 # Generate the waves of 1 second length
 wave1 = sig1.make_wave(0, 1)
@@ -62,16 +62,16 @@ wave2 = sig2.make_wave(0, 1)
 wavelist = [wave1, wave2]
 
 # write a WAV file at sampling frequency 96 kHz
-TS.writeToWAV(wavelist, FILENAMEWAV, SAMP_FREQ, VOL, 2)
+ts.writeToWAV(wavelist, FILENAMEWAV, SAMP_FREQ, VOL, 2)
 
 # write a CSV file 
-TS.writeToCSV(wavelist, FILENAMECSV)
+ts.writeToCSV(wavelist, FILENAMECSV)
 
 
 ### Recording part
 THRESHOLD=10 # dB (SNR)
 # Create the recording object for noise
-rec = TS.Recording([18000, 34000], THRESHOLD)
+rec = ts.Recording([18000, 34000], THRESHOLD)
 # Analyze noise
 noise_p = rec.analyzenoise(FILENAMENOISE)
 # Analyze signal
