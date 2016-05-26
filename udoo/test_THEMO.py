@@ -5,7 +5,7 @@ import scipy as sp
 import numpy as np
 import THEMOSignal as TS
 import wave
-
+import random
 
 
 ### Generation part
@@ -23,7 +23,11 @@ noise_dur = 1.
 mean = 0
 std = 1 
 num_samples = int(SAMP_FREQ/noise_dur)
-noise = np.int16(np.random.normal(mean, std, size=num_samples)*32767*0.4)
+# noise_f = np.random.normal(mean, std, size=num_samples)*32767*0.4
+noise = np.zeros(num_samples, dtype='int16')
+
+for n in range(num_samples):
+    noise[n] = (random.random()*2-1)*32767*0.4
 
 wfile = wave.open(FILENAMENOISE, 'w')
 
@@ -54,7 +58,7 @@ sig2 = TS.Sine(100)
 wave1 = sig1.make_wave(0, 1)
 wave2 = sig2.make_wave(0, 1)
 
-# collect the waves into a list
+# Collect the waves into a list
 wavelist = [wave1, wave2]
 
 # write a WAV file at sampling frequency 96 kHz
@@ -65,6 +69,19 @@ TS.writeToCSV(wavelist, FILENAMECSV)
 
 
 ### Recording part
-rec1 = TS.Recording(FILENAMEWAV, [18000, 34000], 1)
+THRESHOLD=10 # dB (SNR)
+# Create the recording object for noise
+rec = TS.Recording([18000, 34000], THRESHOLD)
+# Analyze noise
+noise_p = rec.analyzenoise(FILENAMENOISE)
+# Analyze signal
+state = rec.analyze(FILENAMEWAV)
 
-state = rec1.analyze()
+# find the power of the signal
+sig_samples = rec.getsamples(FILENAMEWAV)
+samplesFFT = np.fft.fft(sig_samples)
+samplespower = np.linalg.norm(samplesFFT, 2)
+
+
+print "State: " + str(state)
+print "SNR: "+ str(10*np.log10(samplespower/noise_p))+" dB"
