@@ -178,27 +178,18 @@ class Recording(object):
     spectrum of a portion of it and by by trsholding it.
     """
 
-    def __init__(self, start_f=18000, stop_f=34000, th=1):
+    def __init__(self, filename, band=[18000, 34000], th=1):
         """ Object holding data relative to file being read.
 
         start_f double starting frquency of the band of interest
         stop_f double stop frequency of the band of interest
         th: treshold on the power of the spectrum
         """
-        self.start_f = start_f 
-        self.stop_f = stop_f 
+        self.filename = filename
+        self.start_f = band[0] 
+        self.stop_f = band[1]
         self.treshold = th
 
-
-    def analyze(self, filename):
-        """Parse recordings through spectrogram
-
-        This method makes the FFT of the file filename and treshold it.
-        If the file pass the teshold test it is marked as 'sendable',
-        otherwise it is discarded.
-
-        filename string with, guess... the filename!
-        """
         rfile = wave.open(filename, 'r')
 
         params = rfile.getparams()
@@ -216,27 +207,106 @@ class Recording(object):
         rstring = rfile.readframes(-1)
         rsamples = np.fromstring(rstring, datawidth)
 
+        self.samples = rsamples
+
+        
+
+    def getsamples(self):
+
+        """Obtain samples from recording filename
+        """
+        return self.samples
+
+
+    def plotspec(self,filename):
+        """Plot spectrogram of the loaded file.
+
+        filename of the audio file to be loaded
+        """
+
+        NFFT = 1024       # the length of the windowing segments
+        Fs = params[2]    # the sampling frequency
+
+        Pxx, freqs, bins, im = plt.specgram(self.samples, NFFT=NFFT, Fs=Fs,
+                                            noverlap=256,
+                                            cmap=plt.cm.gist_heat)
+        plt.show()
+        
+        
+    def analyze(self):
+        """Parse recordings through spectrogram
+
+        This method makes the FFT of the file filename and treshold it.
+        If the file pass the teshold test it is marked as 'sendable',
+        otherwise it is discarded.
+
+        filename string with, guess... the filename!
+        """
+
         # FFT
-        rsamplesFFT = np.fft.fft(rsamples)
+        rsamplesFFT = np.fft.fft(self.samples)
 
         rsamplespower = np.linalg.norm(rsamplesFFT, 2)
  
         if rsamplespower < self.treshold:
-            os.remove("filename")
+            os.remove(self.filename)
             return 1
         else:
             return 0
         
 
-def writeToWAV(waves, filename, framerate=96000, resolution=2): 
+def writeToWAV(waves, filename, framerate=96000, volume=60, resolution=2): 
     """Method that creates a WAV file from the Waves objects it gets as input.
 
-    waves: list with all signals that will go in the WAV file
-    filename: string containing the filename
-    resolution: integer number of bytes encoding a sample
+    waves list with all signals that will go in the WAV file
+    filename string containing the filename
+    volume integer from 0 to 100 indicting volume of the wav
+    resolution integer number of bytes encoding a sample
     """
 
-    # find out hw many you need and collect samples
+    vol = volume*0.01
+    
+    n_samples = 0
+
+    for w in waves:
+        n_samples = n_samples + w.samples.size
+
+    swidth = 'int' + str(8*resolution)
+    wsamples = np.zeros(n_samples, dtype=swidth)
+  
+    t_ind = 0
+    for w in waves:
+        wsamples[t_ind:t_ind+w.n_samples] = w.samples*32767*vol
+        t_ind = w.n_samples
+    
+    # open file to write
+    wfile = wave.open(filename, 'w')
+    
+    wfile.setnchannels(1)
+    wfile.setframerate(framerate)
+    wfile.setsampwidth(resolution)
+    wfile.setnframes(wsamples.size)
+
+    # transform to binary
+    swsamples = ''
+    for i in range(len(wsamples)):
+         swsamples += wave.struct.pack('h', wsamples[i])
+    
+    # write to file
+    wfile.writeframes(swsamples)
+
+    # close the file
+    wfile.close()
+
+
+def writeToCSV(waves, filename):
+    """Method that creates a CSV file from the Waves objects it gets as input.
+
+    waves list of the waves object to be wrtitten to file
+    filename filename of thefile to be produced
+    """
+    
+
     n_samples = 0    
 
     for w in waves:
@@ -248,16 +318,5 @@ def writeToWAV(waves, filename, framerate=96000, resolution=2):
     for w in waves:
         wsamples[t_ind:t_ind+w.n_samples] = w.samples
         t_ind = w.n_samples
-
-    # open file to write
-    wfile = wave.open(filename, 'w')
     
-    wfile.setnchannels(1)
-    wfile.setframerate(framerate)
-    wfile.setsampwidth(resolution)
-
-    # write to file
-    wfile.writeframes(wsamples)
-
-    # close the file
-    wfile.close()
+    np.savetxt(filename, wsamples, delimiter=' ')
