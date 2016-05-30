@@ -3,17 +3,18 @@ import thread
 import sys
 import binascii
 import os
+import re
 from time import sleep
 from interpreter import Interpreter
 from connector import Connector
 
 class Modem(object):
     """Class modem to control the node via TCP"""
-    
+
     class Status:
         """Internal class where the status sens_ts are defined"""
         IDLE, BUSY2REQ, BUSY2DATA, BUSY2RECV, BUSY2REQ2DATA, KILL = range(6)
-    
+
     class ErrorDict:
         """Internal class to map the error sens_ts to their error message"""
         NONE, SYNT_ERR, WRONG_SETTING, NOT_RESPONDING, FILE_NOT_FOUND, \
@@ -29,16 +30,16 @@ class Modem(object):
             RX_WHILE_TX : 'you attempt to receive while transmitting if \
                 you really want set the force flag to 1'
          }
-          
+
     def __init__(self, ip, port, automatic = True, control_buf_size = 32, data_buf_size = 128, \
         m_to = 0.01, socket_to = 0.005):
         """
         Constructor, initialize the modem and the connector. Connect the
         modem to the submerged node
-        @param self pointer to the class object 
-        @param ip string cointaining the IP address of the TCP server 
-        @param port string with the port of the TCP server socket 
-        @param control_buf_size: int with the control buffer size, in bytes 
+        @param self pointer to the class object
+        @param ip string cointaining the IP address of the TCP server
+        @param port string with the port of the TCP server socket
+        @param control_buf_size: int with the control buffer size, in bytes
         @param data_buf_size: int with the data buffer size, in bytes
         @param m_to: float value time out of the cycle, in [s]
         @param socket_to: time out of the socket checking operation, [s]
@@ -54,7 +55,7 @@ class Modem(object):
         self.error_status = Modem.ErrorDict.NONE
         if automatic:
             thread.start_new_thread(self.run,())
-        
+
     def run(self):
         """
         Run cycle, checks if data available
@@ -94,7 +95,7 @@ class Modem(object):
         off_log = "/var/log/check_status/check_off.log"
         kill_log = "/var/log/check_status/check_kills.log"
         try:
-            f = open (off_log, "r") 
+            f = open (off_log, "r")
             l = f.read(self.conn.data_buf_size)
             while (l or self.status != Modem.Status.KILL):
                 if l == "poweroff":
@@ -104,7 +105,7 @@ class Modem(object):
         except IOError:
             print off_log + " not found"
         try:
-            f = open (kill_log, "r") 
+            f = open (kill_log, "r")
             l = f.read(self.conn.data_buf_size)
             while (l or self.status != Modem.Status.KILL):
                 if (l == ("kill " + str(threadPID)) or \
@@ -121,7 +122,7 @@ class Modem(object):
         @param self pointer to the class object
         """
         self.status = Modem.Status.KILL
-        
+
     def close(self):
         """
         Close the connection from the modem to the submerged node
@@ -131,8 +132,8 @@ class Modem(object):
 
     def recvData(self):
         """
-        Receive the data as they are from the node, it is a blocking 
-        function. To check if data has to be received, query the 
+        Receive the data as they are from the node, it is a blocking
+        function. To check if data has to be received, query the
         self.conn.dataAvailable() function
         @param self pointer to the class object
         @return the incoming string from the TCP connection
@@ -156,6 +157,7 @@ class Modem(object):
         self.status = prec_state
         self.checkConnection(command)
         self.parseCommand(command.rstrip('\n'))
+
         return command
 
     def send(self, msg):
@@ -190,14 +192,14 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
         self.status = Modem.Status.BUSY2DATA
-        f = open (file_path, "rb") 
+        f = open (file_path, "rb")
         l = f.read(self.conn.data_buf_size)
         while (l):
             self.conn.send(l)
             l = f.read(self.conn.data_buf_size)
         f.close()
         self.status = Modem.Status.IDLE
-       
+
     def reqDataFile(self, file_name, delete_flag = 1):
         """
         Require a file from the submerged node
@@ -215,7 +217,7 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
-       
+
     def reqAllData(self, delete_flag = 1):
         """
         Require all the data from the submerged node
@@ -232,7 +234,7 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
-    
+
     def reqRTData(self, ID_list, starting_time, duration, \
         chunck_duration = 1, delete = 1, force_flag = 0):
         """
@@ -242,7 +244,7 @@ class Modem(object):
         @param starting_time HH:MM:SS when to start recording the file
         @param duration HH:MM:SS of duration of the recording
         @param chunck_duration chunk duration, in seconds
-        @param delete flag, if 1 erase it after sending, otherwise if 0 not 
+        @param delete flag, if 1 erase it after sending, otherwise if 0 not
         @param force_flag if trying to record while transmitting:
             0 (default) not allowed (error feedback)
             1 (force) stop transmitting and start recording
@@ -262,7 +264,7 @@ class Modem(object):
 
     def reqSetPower(self, ID_list, s_l):
         """
-        Set the projector power. 
+        Set the projector power.
         @param self pointer to the class object
         @param ID_list list of the projector IDs where to play the file
         @param s_l source level output power
@@ -277,17 +279,17 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
-        
+
     def reqPlayProj(self, name, ID_list, starting_time, n_rip = 1, \
                     delete = 1, force_flag = 0):
         """
-        Transmit the file with the projector. 
+        Transmit the file with the projector.
         @param self pointer to the class object
         @param name of the file that has to be played
         @param ID_list list of the projector IDs where to play the file
         @param starting_time HH:MM:SS when to start playing the file
         @param n_rip number of time it has to be consecutively played
-        @param delete flag, if 1 erase it after playing, if 0 not 
+        @param delete flag, if 1 erase it after playing, if 0 not
         @param force_flag if trying to transmit while recording:
             0 (default) not allowed (error feedback)
             1 (force) stop recording and start transmitting
@@ -304,16 +306,16 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
-        
+
     def reqRecordData(self, name, sens_t, ID_list, starting_time, duration, \
                         force_flag = 0):
         """
-        record via sensors (either hydrophones, camera or others). 
+        record via sensors (either hydrophones, camera or others).
         @param self pointer to the class object
         @param name of the file where to record the audio
         @param sens_t of the sensors that have to record the data:
-            0 --> hydrophone, 
-            1 --> camera 
+            0 --> hydrophone,
+            1 --> camera
             2 --> others
         @param ID_list list of the projector IDs used to record the audio
         @param starting_time HH:MM:SS when to start recording the file
@@ -337,7 +339,7 @@ class Modem(object):
 
     def reqNodeStatus(self):
         """
-        Require the submerged node status. 
+        Require the submerged node status.
         @param self pointer to the class object
         """
         if self.status != Modem.Status.IDLE:
@@ -353,7 +355,7 @@ class Modem(object):
 
     def getNodeStatus(self,status = 0):
         """
-        Get the submerged node status. 
+        Get the submerged node status.
         @param status cointaining the status received from the node
         @param self pointer to the class object
         """
@@ -363,10 +365,10 @@ class Modem(object):
 
     def reqResetProj(self, ID_list, force_flag = 0):
         """
-        Reset the projectors 
+        Reset the projectors
         @param self pointer to the class object
         @param ID_list list of the projector IDs that has to be resetted
-        @param force_flag if 1 reset also if pending operations, if 0 not 
+        @param force_flag if 1 reset also if pending operations, if 0 not
         """
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem resetProj unexpected status: \
@@ -378,18 +380,18 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
-    
+
     def reqResetSensors(self, sens_t, ID_list, force_flag = 0):
         """
-        Reset the sensors (either hydrophones, camera or other) 
+        Reset the sensors (either hydrophones, camera or other)
         @param self pointer to the class object
         @param sens_t of the sensors that have to be reset:
             0 --> all
-            1 --> hydrophone, 
-            2 --> camera 
+            1 --> hydrophone,
+            2 --> camera
             3 --> others
         @param ID_list list of the projector IDs that has to be resetted
-        @param force_flag if 1 reset also if pending operations, if 0 not 
+        @param force_flag if 1 reset also if pending operations, if 0 not
         @return the message
         """
         if self.status != Modem.Status.IDLE:
@@ -402,12 +404,12 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
-    
+
     def reqResetAll(self, force_flag = 0):
         """
-        Build the reset_all message. This message will reset the node 
+        Build the reset_all message. This message will reset the node
         @param self pointer to the class object
-        @param force_flag if 1 reset also if pending operations, if 0 not 
+        @param force_flag if 1 reset also if pending operations, if 0 not
         @return the message
         """
         if self.status != Modem.Status.IDLE:
@@ -420,15 +422,15 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
-        
+
     def reqDeleteAllRec(self, sens_t = 0):
         """
-        Delete the recorded files from the node 
+        Delete the recorded files from the node
         @param self pointer to the class object
         @param sens_t of the sensors that have the data to be deleted:
-            0 --> all 
-            1 --> hydrophone, 
-            2 --> camera 
+            0 --> all
+            1 --> hydrophone,
+            2 --> camera
             3 --> others
         @return the message
         """
@@ -442,10 +444,10 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
-        
+
     def reqDeleteAllSent(self):
         """
-        Delete the files sent by the node 
+        Delete the files sent by the node
         @param self pointer to the class object
         @return the message
         """
@@ -497,7 +499,7 @@ class Modem(object):
         elif self.status == Modem.Status.BUSY2REQ2DATA:
             self.status = Modem.Status.BUSY2REQ
         return self.errorCheck()
-       
+
     def confirmedMyIstr(self):
         """
         Confirm the instruction has been correctely processed
@@ -505,7 +507,7 @@ class Modem(object):
         """
         self.status = Modem.Status.IDLE
         self.error_status = Modem.ErrorDict.NONE
-       
+
     def error(self, err_id):
         """
         Signal the instruction has not been correctely processed
@@ -581,12 +583,13 @@ class Modem(object):
                 return self.error(int(command[1]))
         elif (len(command)==3):
             if (command[0] == 'send_file'):
-                return self.recvDataFile(command[1],int(command[2]),True)
+                cmd2 = re.sub("[^0-9]", "", command[2])
+                return self.recvDataFile(command[1],int(cmd2),True)
             elif (command[0] == 'send_stream'):
                 return self.recvDataFile(command[1],int(command[2]),False)
         return self.reset_myself()
 
 if __name__ == "__main__":
     print("This is the modem class")
-    
+
 #TODO: check status,x,y,z,w,k,..

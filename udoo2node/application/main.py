@@ -18,7 +18,7 @@ try:
     file_path = "ciccio"
     #bridge.sendDataFile(file_path)
     bridge.reqDataFile("ciccio4me")
-    bridge.reqAllData()
+    # bridge.reqAllData()
     bridge.reqRTData(1,[1,3], "10",10)
     bridge.reqSetPower([2,3],5)
     bridge.reqPlayProj("ciccio",[1,4],"10")
