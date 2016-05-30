@@ -304,6 +304,27 @@ class Modem(object):
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
+
+    def reqRunScript(self, script_name, output_name, starting_time, duration):
+        """
+        Run a script in the node. 
+        @param self pointer to the class object
+        @param script_name of the file that has to be run
+        @paran output_name where to redirect the output of the script
+        @param starting_time HH:MM:SS when to start playing the file
+        @param duration in minutes of the script
+        """
+        if self.status != Modem.Status.IDLE:
+            raise ValueError("Modem reqRunScript unexpected status: \
+                " + str(self.status))
+        self.status = Modem.Status.BUSY2REQ
+        self.send(self.interpreter.buildRun(script_name, output_name, \
+            starting_time, duration))
+        while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
+            self.recvCommand()
+        if self.status == Modem.Status.KILL:
+            return self.close()
+        return self.errorCheck()
         
     def reqRecordData(self, name, sens_t, ID_list, starting_time, duration, \
                         force_flag = 0):

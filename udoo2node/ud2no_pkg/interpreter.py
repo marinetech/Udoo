@@ -131,6 +131,23 @@ class Interpreter(object):
         if self.debug :
             print msg
         return msg
+
+    def buildRun(self, script_name, output_name, starting_time, duration):
+        """
+        Build the run_script message. 
+        @param self pointer to the class object
+        @param script_name of the file that has to be run
+        @paran output_name where to redirect the output of the script
+        @param starting_time HH:MM:SS when to start playing the file
+        @param duration in minutes of the script
+        @return the message
+        """
+        msg = self.start() + "run_script" + self.s() + str(script_name) + self.s() + \
+              str(output_name) + self.s() + str(starting_time) +self.s() + \
+              str(duration) + self.end()
+        if self.debug :
+            print msg
+        return msg
         
     def buildRecordData(self, name, sens_t, ID_list, starting_time, duration, \
                         force_flag = 0):
