@@ -4,6 +4,7 @@ import sys
 import binascii
 import os
 import math
+from time import sleep
 from interpreter import Interpreter
 
 class Connector(object):
@@ -83,7 +84,7 @@ class Connector(object):
         @return the command
         """        
         while(self.status == Connector.Status.BUSY):
-            time.sleep(self.to)
+            sleep(self.to)
         self.status = Connector.Status.BUSY
         command = self.sock.recv(self.command_buf_size)
         self.status = Connector.Status.IDLE
@@ -96,7 +97,7 @@ class Connector(object):
     #     @return incoming info from socket
     #     """        
     #     while(self.status == Connector.Status.BUSY):
-    #         time.sleep(self.to)
+    #         sleep(self.to)
     #     self.status = Connector.Status.BUSY
     #     command = self.sock.recv(self.command_buf_size)
     #     self.status = Connector.Status.IDLE
@@ -109,7 +110,7 @@ class Connector(object):
         @return the data
         """        
         while(self.status != Connector.Status.IDLE):
-            time.sleep(self.to)
+            sleep(self.to)
         self.status = Connector.Status.BUSY
         data = self.sock.recv(self.data_buf_size)
         self.status = Connector.Status.IDLE
@@ -121,8 +122,9 @@ class Connector(object):
         @param self pointer to the class object 
         """
         while(self.status != Connector.Status.IDLE):
-            time.sleep(self.to)
+            sleep(self.to)
         self.status = Connector.Status.BUSY
         self.sock.sendall(msg)
         self.status = Connector.Status.IDLE
+        sleep(self.to)
         

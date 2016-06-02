@@ -66,9 +66,9 @@ class Modem(object):
         while True:
             index += 1
             if ((index * self.m_to) > 1):
-                self.check4kill(threadPID)
+                #self.check4kill(threadPID)
                 index = 1
-            if(self.status == Modem.Status.IDLE):
+            if(self.status == Modem.Status.IDLE or self.status == Modem.Status.BUSY2REQ):
                 r, e = self.conn.dataAvailable()
                 if(e):
                     break
@@ -175,6 +175,8 @@ class Modem(object):
         @param self pointer to the class object
         @param file_path path of the file that has to be sent
         """
+        while self.status != Modem.Status.IDLE :
+            sleep(0.1)
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem sendDataFile unexpected status: \
                 " + str(self.status))
@@ -188,7 +190,8 @@ class Modem(object):
         self.send(self.interpreter.buildSendFile(name,size))
         #sleep(self.m_to/2) #to give the rx the time to parse the command
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
-            self.recvCommand()
+            sleep(self.m_to)
+            # self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
         self.status = Modem.Status.BUSY2DATA
@@ -207,13 +210,16 @@ class Modem(object):
         @param file_name name of the required file
         @param delete_flag, if 1 erase it after sending, if 0 not
         """
+        while self.status != Modem.Status.IDLE :
+            sleep(0.1)
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem reqDataFile unexpected status: \
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
         self.send(self.interpreter.buildGetFile(file_name, delete_flag))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
-            self.recvCommand()
+            sleep(self.m_to)
+            # self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
@@ -224,13 +230,16 @@ class Modem(object):
         @param self pointer to the class object
         @param delete_flag, if 1 erase it after sending, if 0 not
         """
+        while self.status != Modem.Status.IDLE :
+            sleep(0.1)
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem reqAllData unexpected status: \
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
         self.send(self.interpreter.buildGetData(delete_flag))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
-            self.recvCommand()
+            sleep(self.m_to)
+            # self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
@@ -250,6 +259,8 @@ class Modem(object):
             1 (force) stop transmitting and start recording
             2 (both) do both the operations together
         """
+        while self.status != Modem.Status.IDLE :
+            sleep(0.1)
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem reqRTData unexpected status: \
                 " + str(self.status))
@@ -257,7 +268,8 @@ class Modem(object):
         self.send(self.interpreter.buildGetRTData(ID_list, starting_time, \
             duration, chunck_duration, delete , force_flag))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
-            self.recvCommand()
+            sleep(self.m_to)
+            # self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
@@ -269,13 +281,16 @@ class Modem(object):
         @param ID_list list of the projector IDs where to play the file
         @param s_l source level output power
         """
+        while self.status != Modem.Status.IDLE :
+            sleep(0.1)
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem setPower unexpected status: \
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
         self.send(self.interpreter.buildSetPower(ID_list, s_l))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
-            self.recvCommand()
+            sleep(self.m_to)
+            # self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
@@ -295,6 +310,8 @@ class Modem(object):
             1 (force) stop recording and start transmitting
             2 (both) do both the operations together
         """
+        while self.status != Modem.Status.IDLE :
+            sleep(0.1)
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem playProj unexpected status: \
                 " + str(self.status))
@@ -302,7 +319,8 @@ class Modem(object):
         self.send(self.interpreter.buildPlay(name, ID_list, starting_time, \
             n_rip, delete, force_flag))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
-            self.recvCommand()
+            sleep(self.m_to)
+            # self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
@@ -316,6 +334,8 @@ class Modem(object):
         @param starting_time HH:MM:SS when to start playing the file
         @param duration in minutes of the script
         """
+        while self.status != Modem.Status.IDLE :
+            sleep(0.1)
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem reqRunScript unexpected status: \
                 " + str(self.status))
@@ -323,7 +343,8 @@ class Modem(object):
         self.send(self.interpreter.buildRun(script_name, output_name, \
             starting_time, duration))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
-            self.recvCommand()
+            sleep(self.m_to)
+            #self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
@@ -346,6 +367,8 @@ class Modem(object):
             1 (force) stop transmitting and start recording
             2 (both) do both the operations together
         """
+        while self.status != Modem.Status.IDLE :
+            sleep(0.1)
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem recordAudio unexpected status:\
                 " + str(self.status))
@@ -353,7 +376,8 @@ class Modem(object):
         self.send(self.interpreter.buildRecordData(name, sens_t, ID_list, \
             starting_time, duration, force_flag))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
-            self.recvCommand()
+            sleep(self.m_to)
+            #self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
@@ -363,13 +387,16 @@ class Modem(object):
         Require the submerged node status.
         @param self pointer to the class object
         """
+        while self.status != Modem.Status.IDLE :
+            sleep(0.1)
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem getNodeStatus unexpected status: \
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
         self.send(self.interpreter.buildGetStatus())
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
-            self.recvCommand()
+            sleep(self.m_to)
+            #self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
@@ -391,13 +418,16 @@ class Modem(object):
         @param ID_list list of the projector IDs that has to be resetted
         @param force_flag if 1 reset also if pending operations, if 0 not
         """
+        while self.status != Modem.Status.IDLE :
+            sleep(0.1)
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem resetProj unexpected status: \
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
         self.send(self.interpreter.buildResetProj(ID_list, force_flag))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
-            self.recvCommand()
+            sleep(self.m_to)
+            #self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
@@ -415,13 +445,16 @@ class Modem(object):
         @param force_flag if 1 reset also if pending operations, if 0 not
         @return the message
         """
+        while self.status != Modem.Status.IDLE :
+            sleep(0.1)
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem reqResetSensor unexpected status: \
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
         self.send(self.interpreter.buildResetSensor(sens_t, ID_list, force_flag))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
-            self.recvCommand()
+            sleep(self.m_to)
+            #self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
@@ -433,13 +466,16 @@ class Modem(object):
         @param force_flag if 1 reset also if pending operations, if 0 not
         @return the message
         """
+        while self.status != Modem.Status.IDLE :
+            sleep(0.1)
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem resetAll unexpected status: \
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
         self.send(self.interpreter.buildResetAll(force_flag))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
-            self.recvCommand()
+            sleep(self.m_to)
+            #self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
@@ -455,13 +491,16 @@ class Modem(object):
             3 --> others
         @return the message
         """
+        while self.status != Modem.Status.IDLE :
+            sleep(0.1)
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem deleteAllRec unexpected status: \
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
         self.send(self.interpreter.buildDeleteAllRec(sens_t))
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
-            self.recvCommand()
+            sleep(self.m_to)
+            #self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
@@ -472,13 +511,16 @@ class Modem(object):
         @param self pointer to the class object
         @return the message
         """
+        while self.status != Modem.Status.IDLE :
+            sleep(0.1)
         if self.status != Modem.Status.IDLE:
             raise ValueError("Modem deleteAllSent unexpected status: \
                 " + str(self.status))
         self.status = Modem.Status.BUSY2REQ
         self.send(self.interpreter.buildDeleteAllSent())
         while self.status != Modem.Status.IDLE and self.status != Modem.Status.KILL:
-            self.recvCommand()
+            sleep(self.m_to)
+            #self.recvCommand()
         if self.status == Modem.Status.KILL:
             return self.close()
         return self.errorCheck()
@@ -491,6 +533,8 @@ class Modem(object):
         @param length_f of the file, in bytes
         @paran confirm_flag True if confirm needed. When stream is false
         """
+        while self.status != Modem.Status.IDLE and self.status != Modem.Status.BUSY2REQ:
+            sleep(0.1)
         if self.status == Modem.Status.IDLE:
             self.status = Modem.Status.BUSY2DATA
         elif self.status == Modem.Status.BUSY2REQ:
@@ -504,10 +548,7 @@ class Modem(object):
         f = open(file_name,'wb') #open in binary
         n_recv = 0;
         print "recvFile", file_name, length_f
-        while (n_recv < length_f or self.status != Modem.Status.KILL):
-            if self.status == Modem.Status.KILL:
-                f.close()
-                return self.close()
+        while (n_recv < length_f and self.status != Modem.Status.KILL):
             l = self.recvData()
             if(n_recv + len(l) < length_f):
                 f.write(l)
@@ -515,6 +556,9 @@ class Modem(object):
                 f.write(l[0:length_f - n_recv])
             n_recv += len(l)
         f.close()
+        if self.status == Modem.Status.KILL:
+            f.close()
+            return self.close()
         if self.status == Modem.Status.BUSY2DATA:
             self.status = Modem.Status.IDLE
         elif self.status == Modem.Status.BUSY2REQ2DATA:
@@ -605,9 +649,10 @@ class Modem(object):
         elif (len(command)==3):
             if (command[0] == 'send_file'):
                 cmd2 = re.sub("[^0-9]", "", command[2])
-                return self.recvDataFile(command[1],int(cmd2),True)
+                return self.recvDataFile(command[1],int(cmd2),False)
             elif (command[0] == 'send_stream'):
-                return self.recvDataFile(command[1],int(command[2]),False)
+                cmd2 = re.sub("[^0-9]", "", command[2])
+                return self.recvDataFile(command[1],int(cmd2),False)
         return self.reset_myself()
 
 if __name__ == "__main__":
