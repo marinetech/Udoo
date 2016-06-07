@@ -7,7 +7,7 @@ TCP_IP = "127.0.0.1"
 #TCP_IP = "localhost"
 TCP_PORT = 44444
 BUFFER_SIZE = 64
-DATA_BUFFER_SIZE = 128
+DATA_BUFFER_SIZE = 64
 
 myPID = os.getpid()
 print "HI ", myPID, "!!"
@@ -22,7 +22,7 @@ try:
     bridge.reqRunScript("ciccio.sh", "cavallo", "10.30", 20)
     # bridge.reqAllData()
     time.sleep(0.1)
-    bridge.reqRTData(1,[1,3], "10",10)
+    bridge.reqRTData(1,[1,3], "13",13)
     time.sleep(0.1)
     bridge.reqSetPower([2,3],5)
     time.sleep(0.1)

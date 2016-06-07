@@ -53,6 +53,7 @@ class Modem(object):
         self.interpreter = Interpreter()
         self.mainPID = os.getpid()
         self.error_status = Modem.ErrorDict.NONE
+        self.commands_queue = "".split(Interpreter.END_COMMAND)
         if automatic:
             thread.start_new_thread(self.run,())
 
@@ -74,7 +75,6 @@ class Modem(object):
                     break
                 if(r):
                     rx = self.recvCommand()
-                    print "Rx ",rx
                     if (len(rx) == 0):
                         break
             elif(self.status == Modem.Status.KILL):
@@ -156,7 +156,8 @@ class Modem(object):
         command = self.conn.recvCommand()
         self.status = prec_state
         self.checkConnection(command)
-        self.parseCommand(command.rstrip('\n'))
+        # self.parseCommand(command.rstrip('\n'))
+        self.parseDivCommands(command)
 
         return command
 
@@ -547,14 +548,24 @@ class Modem(object):
         self.status = Modem.Status.BUSY2DATA
         f = open(file_name,'wb') #open in binary
         n_recv = 0;
-        print "recvFile", file_name, length_f
+        if self.interpreter.debug:
+            print "Modem::recvDataFile: recvFile", file_name, length_f
         while (n_recv < length_f and self.status != Modem.Status.KILL):
-            l = self.recvData()
+            l = self.commands_queue.pop(0) if len(self.commands_queue) else self.recvData()
             if(n_recv + len(l) < length_f):
                 f.write(l)
             else:
                 f.write(l[0:length_f - n_recv])
+                residue = l[length_f - n_recv : ]
+                if not residue == "":
+                    if not residue.endswith(Interpreter.END_COMMAND):
+                        residue = residue + self.conn.recvCommand()
+                    if self.interpreter.debug:
+                        print "Modem::recvDataFile residue = ", residue
+                    self.commands_queue.extend(residue.split(Interpreter.END_COMMAND))
+           
             n_recv += len(l)
+
         f.close()
         if self.status == Modem.Status.KILL:
             f.close()
@@ -604,19 +615,28 @@ class Modem(object):
         self.error_status = Modem.ErrorDict.NONE
 
 
-    # def parseDivCommands(self, msg):
-    #     """
-    #     Parse the received message from the node and process it
-    #     dividing all the commands
-    #     @param self pointer to the class object
-    #     """
-    #     if(self.status == Modem.Status.KILL):
-    #         return
-    #     commands_list = msg.split(Interpreter.START_COMMAND)
-    #     for command in commands_list:
-    #         fine_command = command.split(Interpreter.END_COMMAND)
-    #         print fine_command[0]
-    #         self.parseCommand(fine_command[0])
+    def parseDivCommands(self, msg):
+        """
+        Parse the received message from the node and process it
+        dividing all the commands
+        @param self pointer to the class object
+        """
+        if(self.status == Modem.Status.KILL):
+            return
+        # commands_queue = msg.split(Interpreter.START_COMMAND)
+        # for command in commands_queue:
+        #     fine_command = command.split(Interpreter.END_COMMAND)
+        #     print fine_command[0]
+        #     self.parseCommand(fine_command[0])
+        self.commands_queue.extend(msg.split(Interpreter.END_COMMAND))
+        # for command in commands_queue:
+        #     print command
+        #     self.parseCommand(command)
+        while len(self.commands_queue):
+            command = self.commands_queue.pop(0)
+            if self.interpreter.debug:
+                print "parseDivCommands command: ",command
+            self.parseCommand(command)
 
     def checkConnection(self,msg):
         """
@@ -635,8 +655,10 @@ class Modem(object):
         Parse the received message from the node and process it
         @param self pointer to the class object
         """
+        if msg == "":
+            return
         if self.interpreter.debug:
-            print msg
+            print "Modem::parseCommand: ", msg
         if(self.status == Modem.Status.KILL):
             return
         command = msg.split(Interpreter.SEPARATOR)

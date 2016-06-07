@@ -2,7 +2,7 @@ import math
 class Interpreter(object):
     """Class to build the command string for the modem"""
     SEPARATOR = ","
-    END_COMMAND = ""
+    END_COMMAND = "\r\n"
     START_COMMAND = ""
     
     def __init__(self):
@@ -64,7 +64,7 @@ class Interpreter(object):
         msg = self.start() + "send_file" + self.s() + str(name) + self.s() + \
             str(size) + self.end()
         if self.debug :
-            print msg
+            print "Interpreter::buildSendFile: ", msg
         return msg
         
     def buildGetFile(self, name, delete = 1):
@@ -78,7 +78,7 @@ class Interpreter(object):
         msg = self.start() + "get_file" + self.s() + str(name)+ self.s() + \
             str(delete) + self.end()
         if self.debug :
-            print msg
+            print "Interpreter::buildGetFile: ", msg
         return msg
       
     def buildGetData(self, delete = 1):
@@ -90,7 +90,7 @@ class Interpreter(object):
         """
         msg = self.start() + "get_data" + self.s() + str(delete) + self.end()
         if self.debug :
-            print msg
+            print "Interpreter::buildGetData: " ,msg
         return msg      
  
     def buildSetPower(self, ID_list, s_l):
@@ -105,7 +105,7 @@ class Interpreter(object):
         msg = self.start() + "set_power" + self.s() + str(cum_id) + self.s() + str(s_l) \
             + self.end()
         if self.debug :
-            print msg
+            print "Interpreter::buildSetPower: ", msg
         return msg
         
     def buildPlay(self, name, ID_list, starting_time, n_rip = 1, \
@@ -129,7 +129,7 @@ class Interpreter(object):
             self.s() + str(starting_time) +self.s() + str(n_rip) + self.s() + \
             str(delete) + self.s() + str(force_flag) + self.end()
         if self.debug :
-            print msg
+            print "Interpreter::buildPlay: ", msg
         return msg
 
     def buildRun(self, script_name, output_name, starting_time, duration):
@@ -146,7 +146,7 @@ class Interpreter(object):
               str(output_name) + self.s() + str(starting_time) +self.s() + \
               str(duration) + self.end()
         if self.debug :
-            print msg
+            print "Interpreter::buildRun: ", msg
         return msg
         
     def buildRecordData(self, name, sens_t, ID_list, starting_time, duration, \
@@ -174,7 +174,7 @@ class Interpreter(object):
             str(starting_time) + self.s() + str(duration) + self.s() + \
             str(force_flag) + self.end()
         if self.debug :
-            print msg
+            print "Interpreter::buildRecordData: ", msg
         return msg
 
     def buildGetRTData(self, sens_t, ID_list, starting_time, duration, chunck_duration, \
@@ -202,7 +202,7 @@ class Interpreter(object):
             str(cum_id) + self.s() + str(starting_time) + self.s() + str(duration)+ \
             self.s() + str(chunck_duration)+ self.s() + str(delete) + self.end()
         if self.debug :
-            print msg
+            print "Interpreter::buildGetRTData: ", msg
         return msg
         
     def buildGetStatus(self):
@@ -213,7 +213,7 @@ class Interpreter(object):
         """
         msg = self.start() + "get_status" + self.end()
         if self.debug :
-            print msg
+            print "Interpreter::buildGetStatus: ", msg
         return msg
         
     def buildResetProj(self, ID_list, force_flag = 0):
@@ -228,7 +228,7 @@ class Interpreter(object):
         msg = self.start() + "reset_proj" + self.s() + str(cum_id) + self.s() + \
             str(force_flag) + self.end()
         if self.debug :
-            print msg
+            print "Interpreter::buildResetProj: ", msg
         return msg
     
     def buildResetSensor(self, sens_t, ID_list, force_flag = 0):
@@ -247,7 +247,7 @@ class Interpreter(object):
         msg = self.start() + "reset_sen" + self.s() + str(sens_t) + self.s() \
             + str(cum_id) + self.s() + str(force_flag) + self.end()
         if self.debug :
-            print msg
+            print "Interpreter::buildResetSensor: ", msg
         return msg
     
     def buildResetAll(self, force_flag = 0):
@@ -259,7 +259,7 @@ class Interpreter(object):
         """
         msg = self.start() + "reset_all" + self.s() + str(force_flag) + self.end()
         if self.debug :
-            print msg
+            print "Interpreter::buildResetAll: ", msg
         return msg
         
     def buildDeleteAllRec(self, sens_t):
@@ -276,7 +276,7 @@ class Interpreter(object):
         """
         msg = "delete_all_rec" + self.s() + str(sens_t)
         if self.debug :
-            print msg
+            print "Interpreter::buildDeleteAllRec: ", msg
         return msg
         
     def buildDeleteAllSent(self):
@@ -288,7 +288,7 @@ class Interpreter(object):
         """
         msg = self.start() + "delete_all_sent" + self.end()
         if self.debug :
-            print msg
+            print "Interpreter::buildDeleteAllSent: ", msg
         return msg
     
     def getCumulativeID(self,ID_list):
