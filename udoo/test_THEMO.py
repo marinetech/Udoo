@@ -18,7 +18,7 @@ FILENAMECSV = "sound.csv"
 VOL = 60 # volume 60%
 
 
-# generate some noise for the purpose of simulation
+####### generate some noise for the purpose of simulation ####################
 noise_dur = 1.
 mean = 0
 std = 1 
@@ -46,7 +46,7 @@ wfile.writeframes(wnoise)
 
 # close the file
 wfile.close()
-
+##############################################################################
 
 
 ## Generate a chirp signal passing from 50 to 100 Hz in 1 second
@@ -54,7 +54,7 @@ sig1 = ts.Chirp(50, 100, 1)
 # Generate a sine tone at 100 Hz frequency
 sig2 = ts.Sine(100)
 
-# Generate the waves of 1 second length
+# Generate the waves of 1 second length, starting from 0
 wave1 = sig1.make_wave(0, 1)
 wave2 = sig2.make_wave(0, 1)
 
@@ -69,19 +69,20 @@ ts.writeToCSV(wavelist, FILENAMECSV)
 
 
 ### Recording part
-THRESHOLD=10 # dB (SNR)
+THRESHOLD = 5 # dB (SNR)
 # Create the recording object for noise
-rec = ts.Recording([18000, 34000], THRESHOLD)
-# Analyze noise
-noise_p = rec.analyzenoise(FILENAMENOISE)
-# Analyze signal
-state = rec.analyze(FILENAMEWAV)
+rec = ts.Recording([7000, 78000], THRESHOLD)
+# Calculate noise power
+noise_p = rec.noise_power(FILENAMENOISE)
+# Record signal: date format 'dd.mm.YYYY hh:mm:ss'
+rec.record_stream("22.06.2016 15:27:00", 20, "audio")
 
-# find the power of the signal
+
+####### find the power of the signal to plot SNR ####################
 sig_samples = rec.getsamples(FILENAMEWAV)
 samplesFFT = np.fft.fft(sig_samples)
 samplespower = np.linalg.norm(samplesFFT, 2)
+#####################################################################
 
-
-print "State: " + str(state)
 print "SNR: "+ str(10*np.log10(samplespower/noise_p))+" dB"
+print "Done! Give me coffee!"
