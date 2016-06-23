@@ -30,8 +30,8 @@
 # email: campagn1@dei.unipd.it
 # place it in /usr/local/bin/upload_files.tcl
 # Breif description: script to upload files of an user
-set remote_user "filippo"
-set pass "bastard"
+set remote_user "pc104"
+set pass ""
 set host "192.168.100.98"
 set uploads_folder "files2upload"
 set uploaded_folder "files_uploaded"
