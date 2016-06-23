@@ -390,19 +390,20 @@ class Recording(object):
 
             # Find out who's there
             files = os.listdir(a_path)
-            files.remove(dirname)
+            for file in files:
+                if not file.endswith('.wav'):
+                    files.remove(file)
 
             for f in files:
 
                 # Absolute path of file
-                filename = a_path + f
-                filename = a_path + "/sound.wav"
+                filename = os.path.join(a_path, f)
 
                 # Check if file has finished writing-off
                 writing = True
                 file_size = os.path.getsize(filename)
                 while (writing):
-                    time.sleep(0.5)
+                    time.sleep(0.4)
                     if file_size < os.path.getsize(filename):
                         file_size = os.path.getsize(filename)
                     else:
