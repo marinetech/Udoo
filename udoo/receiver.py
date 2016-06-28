@@ -32,23 +32,34 @@ print("Hello")
 bridge = ud2no_pkg.Modem(TCP_IP,TCP_PORT,True,BUFFER_SIZE,DATA_BUFFER_SIZE)
 print("Connected")
 ########
+try:
+	bridge.reqRecordData(FILENAMENOISE,1,[1,4],round(time.time() + 2),5)
+	time.sleep(1)
+	bridge.reqDataFile(FILENAMENOISE)
+	time.sleep(1)
 
-bridge.reqRecordData(FILENAMENOISE,1,[1,4],"10",5)
-time.sleep(1)
-bridge.reqDataFile(FILENAMENOISE)
-time.sleep(1)
+	### Recording part
+	THRESHOLD = 20 # dB (SNR)
+	# Create the recording object for noise
+	rec = ts.Recording([7000, 78000], THRESHOLD)
+	# Calculate noise power
+	noise_p = rec.noise_power(FILENAMENOISE)
+	# Record signal: date format 'dd.mm.YYYY hh:mm:ss'
 
-### Recording part
-THRESHOLD = 0.1 # dB (SNR)
-# Create the recording object for noise
-rec = ts.Recording([7000, 78000], THRESHOLD)
-# Calculate noise power
-noise_p = rec.noise_power(FILENAMENOISE)
-# Record signal: date format 'dd.mm.YYYY hh:mm:ss'
-print "rec.py: reqRTDATA"
-bridge.reqRTData(1,[1,3], "20",20)
-time.sleep(1)
-rec.record_stream(time.strftime('%d.%m.%Y %H:%M:%S', time.localtime()), 20, ".")
+	hydrop_list = [1,3]
+	print "rec.py: reqRTDATA"
+	bridge.reqRTData(1, hydrop_list, round(time.time() + 2), 22)
+	time.sleep(1)
+	rec.record_stream(time.strftime('%d.%m.%Y %H:%M:%S', time.localtime()), 22, ".")
+	bridge.reqDeleteAllRec()
+	time.sleep(0.1)
+	bridge.reqDeleteAllSent()
+	time.sleep(0.1)
+	time.sleep(0.1)
+	bridge.reqResetSensors(1, hydrop_list)
 
+finally:
+	print >>sys.stderr, 'closing socket'
+	bridge.close()
 #####################################################################
 

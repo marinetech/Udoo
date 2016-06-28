@@ -57,15 +57,24 @@ ts.writeToWAV(wavelist, FILENAMEWAV, SAMP_FREQ, VOL, 2)
 
 time.sleep(1)
 
+projector_list = [2,3]
+
 print "File Generater: ", FILENAMEWAV
 
 try:
 	bridge.sendDataFile(FILENAMEWAV)
 	time.sleep(0.1)
 	print "File Sent: ", FILENAMEWAV
-	bridge.reqPlayProj(FILENAMEWAV,[1,4],"10")
+	bridge.reqSetPower(projector_list,5)
+	time.sleep(0.1)
+	bridge.reqPlayProj(FILENAMEWAV,[1,4],round(time.time() + 2))
 	print "File Played 10 times: ", FILENAMEWAV
+	bridge.reqResetSensors(1,[1,4])
+	time.sleep(0.1)
+	bridge.reqDeleteAllSent()
+	time.sleep(0.1)
+	bridge.reqResetProj(projector_list)
 
 finally:
-    print >>sys.stderr, 'closing socket'
-    bridge.close()
+	print >>sys.stderr, 'closing socket'
+	bridge.close()
