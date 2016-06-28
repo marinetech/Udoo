@@ -308,7 +308,7 @@ class Recording(object):
  
         # Finally, threshold the track
         if snr_dB < self.treshold:
-            os.remove(filename)
+            #os.remove(filename)
             return 1
         else:
             return 0

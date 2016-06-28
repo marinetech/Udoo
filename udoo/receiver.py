@@ -39,22 +39,16 @@ bridge.reqDataFile(FILENAMENOISE)
 time.sleep(1)
 
 ### Recording part
-THRESHOLD = 5 # dB (SNR)
+THRESHOLD = 0.1 # dB (SNR)
 # Create the recording object for noise
 rec = ts.Recording([7000, 78000], THRESHOLD)
 # Calculate noise power
 noise_p = rec.noise_power(FILENAMENOISE)
 # Record signal: date format 'dd.mm.YYYY hh:mm:ss'
-
+print "rec.py: reqRTDATA"
 bridge.reqRTData(1,[1,3], "20",20)
-
+time.sleep(1)
 rec.record_stream(time.strftime('%d.%m.%Y %H:%M:%S', time.localtime()), 20, ".")
 
-####### find the power of the signal to plot SNR ####################
-sig_samples = rec.getsamples(FILENAMEWAV)
-samplesFFT = np.fft.fft(sig_samples)
-samplespower = np.linalg.norm(samplesFFT, 2)
 #####################################################################
 
-print "SNR: "+ str(10*np.log10(samplespower/noise_p))+" dB"
-print "Done! Give me coffee!"
