@@ -50,7 +50,7 @@ try:
 	print "rec.py: reqRTDATA"
 	bridge.reqRTData(1, hydrop_list, round(time.time() + 2), 22)
 	time.sleep(1)
-	rec.record_stream(time.strftime('%d.%m.%Y %H:%M:%S', time.localtime()), 22, ".")
+	rec.record_stream(time.strftime('%d.%m.%Y %H:%M:%S', time.localtime()), 22, "out")
 	bridge.reqDeleteAllRec()
 	time.sleep(0.1)
 	bridge.reqDeleteAllSent()

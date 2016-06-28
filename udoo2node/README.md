@@ -16,7 +16,7 @@ FC:todo: add something more (where to find the documentation, etc..)
 
 4)	set_power,cum_id,s_l: the set_power message(cum_id cumulative list (NOTE1) of the projector IDs where to play the file, s_l source level output power)
 
-5)	play_audio,name,cum_id,starting_time,n_rip: the play_audio message (name of the file that has to be played, cum_id cumulative list (NOTE1) of the projector IDs where to play the file, starting_time HH:MM:SS when to start playing the file, n_rip number of time it has to be consecutively played, delete flag, if 1 erase it after playing, if 0 not, force_flag if trying to transmit while recording:
+5)	play_audio,name,cum_id,starting_time,n_rip: the play_audio message (name of the file that has to be played, cum_id cumulative list (NOTE1) of the projector IDs where to play the file, starting_time Unix timestamp, in second, when to start playing the file, n_rip number of time it has to be consecutively played, delete flag, if 1 erase it after playing, if 0 not, force_flag if trying to transmit while recording:
             0 (default) not allowed (error feedback)
             1 (force) stop recording and start transmitting
             2 (both) do both the operations together
@@ -26,7 +26,7 @@ FC:todo: add something more (where to find the documentation, etc..)
             1 --> hydrophone,
             2 --> camera
             3 --> others,
-    cum_id cumulative (NOTE1) list of the sensors IDs used to record the audio, starting_time HH:MM:SS when to start recording the file, duration HH:MM:SS of duration of the recording, force_flag if trying to record while transmitting:
+    cum_id cumulative (NOTE1) list of the sensors IDs used to record the audio, starting_time Unix timestamp, in second, when to start recording the file, duration duration, in minutes of the recording, force_flag if trying to record while transmitting:
             0 (default) not allowed (error feedback)
             1 (force) stop transmitting and start recording
             2 (both) do both the operations together
@@ -36,7 +36,7 @@ FC:todo: add something more (where to find the documentation, etc..)
             1 --> hydrophone,
             2 --> camera
             3 --> others,
-    starting_time HH:MM:SS when to start recording the file, duration HH:MM:SS of duration of the recording, chunck_duration chunk duration [seconds], delete flag, if 1 erase it after sending, otherwise if 0 not, force_flag if trying to record while transmitting:
+    starting_time Unix timestamp, in second, when to start recording the file, duration duration, in minutes of the recording, chunck_duration chunk duration [seconds], delete flag, if 1 erase it after sending, otherwise if 0 not, force_flag if trying to record while transmitting:
                 0 (default) not allowed (error feedback)
                 1 (force) stop transmitting and start recording
                 2 (both) do both the operations together

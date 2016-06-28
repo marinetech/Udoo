@@ -251,8 +251,8 @@ class Modem(object):
         Require the data real time from the submerged node.
         @param self pointer to the class object
         @param ID_list list of the projector IDs used to record the audio
-        @param starting_time HH:MM:SS when to start recording the file
-        @param duration HH:MM:SS of duration of the recording
+        @param starting_time Unix timestamp, in second, when to start recording the file
+        @param duration duration, in minutes of the recording
         @param chunck_duration chunk duration, in seconds
         @param delete flag, if 1 erase it after sending, otherwise if 0 not
         @param force_flag if trying to record while transmitting:
@@ -303,7 +303,7 @@ class Modem(object):
         @param self pointer to the class object
         @param name of the file that has to be played
         @param ID_list list of the projector IDs where to play the file
-        @param starting_time HH:MM:SS when to start playing the file
+        @param starting_time Unix timestamp, in second, when to start playing the file
         @param n_rip number of time it has to be consecutively played
         @param delete flag, if 1 erase it after playing, if 0 not
         @param force_flag if trying to transmit while recording:
@@ -332,7 +332,7 @@ class Modem(object):
         @param self pointer to the class object
         @param script_name of the file that has to be run
         @paran output_name where to redirect the output of the script
-        @param starting_time HH:MM:SS when to start playing the file
+        @param starting_time Unix timestamp, in second, when to start playing the file
         @param duration in minutes of the script
         """
         while self.status != Modem.Status.IDLE :
@@ -361,8 +361,8 @@ class Modem(object):
             1 --> camera
             2 --> others
         @param ID_list list of the projector IDs used to record the audio
-        @param starting_time HH:MM:SS when to start recording the file
-        @param duration HH:MM:SS of duration of the recording
+        @param starting_time Unix timestamp, in second, when to start recording the file
+        @param duration duration, in minutes of the recording
         @param force_flag if trying to record while transmitting:
             0 (default) not allowed (error feedback)
             1 (force) stop transmitting and start recording
