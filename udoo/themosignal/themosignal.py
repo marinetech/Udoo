@@ -297,12 +297,12 @@ class Recording(object):
    
         # FFT
         rsamplesFFT = np.fft.fft(rsamples)
-        rsamplesFFT_max = np.max(rsamplesFFT)
-        rsamplesFFT_med = np.median(rsamplesFFT)
+        rsamplesFFT_max = np.max(np.abs(rsamplesFFT))
+        rsamplesFFT_med = np.median(np.abs(rsamplesFFT))
 
         MMR_dB = 20*np.log10(rsamplesFFT_max/rsamplesFFT_med)
  
-        # update queue of analyzed files
+        # Update queue of analyzed files
         if filename in self.analyzed:
             print "File already analyzed"
         else:
