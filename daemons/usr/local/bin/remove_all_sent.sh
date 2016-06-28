@@ -37,5 +37,5 @@ users_list=$(ls /home/)
 files_folder='files_uploaded'
 for user_i in $users_list
 do
-	rm /home/$user_i/$files_folder/*
+	rm -r /home/$user_i/$files_folder/*
 done

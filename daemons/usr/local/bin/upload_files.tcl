@@ -46,7 +46,7 @@ if {$argc != 1} {
     set user_name [lindex $argv 0]
 }
 
-spawn bash -c "scp /home/$user_name/$uploads_folder/* $remote_user@${host}:."
+spawn bash -c "scp -r /home/$user_name/$uploads_folder/* $remote_user@${host}:."
 expect {           
     -re {(.*)password:} {
         send "$pass\r"
