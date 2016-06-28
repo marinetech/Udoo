@@ -297,8 +297,10 @@ class Recording(object):
    
         # FFT
         rsamplesFFT = np.fft.fft(rsamples)
-        rsamplespower = np.linalg.norm(rsamplesFFT, 2)
-        snr_dB = 10*np.log10(rsamplespower/self.noisepower)
+        rsamplesFFT_max = np.amx(rsamplesFFT)
+        rsamplesFFT_med = np.median(rsamplesFFT)
+
+        MMR_dB = 20*np.log10(rsamplesFFT_max/rsamplesFFT_med)
  
         # update queue of analyzed files
         if filename in self.analyzed:
@@ -307,7 +309,7 @@ class Recording(object):
             self.analyzed.append(filename)
  
         # Finally, threshold the track
-        if snr_dB < self.treshold:
+        if MMR_dB < self.treshold:
             #os.remove(filename)
             return 1
         else:
