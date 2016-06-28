@@ -297,7 +297,7 @@ class Recording(object):
    
         # FFT
         rsamplesFFT = np.fft.fft(rsamples)
-        rsamplesFFT_max = np.amx(rsamplesFFT)
+        rsamplesFFT_max = np.max(rsamplesFFT)
         rsamplesFFT_med = np.median(rsamplesFFT)
 
         MMR_dB = 20*np.log10(rsamplesFFT_max/rsamplesFFT_med)
