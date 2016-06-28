@@ -352,7 +352,8 @@ class Recording(object):
         return rsamplespower
 
 
-    def record_stream(self, s_time, duration, s_folder, chunk_d=1):
+    def record_stream(self, s_time, duration, s_folder, file_ext='.wav',
+                                                                chunk_d=1):
         """ Method that lets the user to analyze files in a real-time fashion.
 
         Files are analyzed as the are set by the node to the actual folder.
@@ -389,10 +390,11 @@ class Recording(object):
             time.sleep(chunk_d) 
 
             # Find out who's there
-            files = os.listdir(a_path)
-            for file in files:
-                if not file.endswith('.wav'):
-                    files.remove(file)
+            dir_ls = os.listdir(a_path)
+            files = []
+            for l in dir_ls:
+                if l.endswith('.wav'):
+                    files.append(l)
 
             for f in files:
 
@@ -410,7 +412,7 @@ class Recording(object):
                         writing = False
 
                 # Decide if chuck is good
-                if ~self.analyze(filename):
+                if not self.analyze(filename):
                     shutil.move(filename, a_path + "/" + dirname)
                 else:
                     os.remove(filename)
