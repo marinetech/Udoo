@@ -54,6 +54,7 @@ expect {
     } -re {(.*)yes/no\)?} {
         send "yes\r"
         set timeout -1
+        exp_continue
     } timeout {
 
     } -re . {

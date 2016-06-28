@@ -50,10 +50,11 @@ spawn bash -c "scp ~/$uploads_folder/$file_name $remote_user@${host}:."
 expect {           
     -re {(.*)password:} {
         send "$pass\r"
-	exp_continue
+	   exp_continue
     } -re {(.*)yes/no\)?} {
         send "yes\r"
         set timeout -1
+        exp_continue
     } timeout {
 
     } -re . {
