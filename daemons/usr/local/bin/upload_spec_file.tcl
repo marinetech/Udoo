@@ -31,7 +31,7 @@
 # place it in /usr/local/bin/upload_spec_file.tcl
 # Breif description: script to upload a file given the name
 set remote_user "pc104"
-set pass ""
+set pass "pc104"
 set host "192.168.100.98"
 set uploads_folder "files2upload"
 set uploaded_folder "files_uploaded"
