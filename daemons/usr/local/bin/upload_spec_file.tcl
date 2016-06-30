@@ -35,26 +35,30 @@ set pass "pc104"
 set host "192.168.100.98"
 set uploads_folder "files2upload"
 set uploaded_folder "files_uploaded"
+set home_folder "~"
 
-if {$argc != 1} {
-    puts "The script requires one input:"
-    puts "- file_name"
+if {$argc < 1} {
+    puts "The script requires at least one input:"
+    puts "- file_name <user_name>"
     puts "example: ./upload_spec_file.tcl file1"
     puts "Please try again."
     return
 } else {
     set file_name [lindex $argv 0]
+    if {$argc == 2} {
+        set home_folder  [lindex $argv 1]
+	set home_folder "/home/$home_folder"
+    }
 }
 
 spawn bash -c "scp -r ~/$uploads_folder/$file_name $remote_user@${host}:."
 expect {           
     -re {(.*)password:} {
         send "$pass\r"
-	   exp_continue
+	exp_continue
     } -re {(.*)yes/no\)?} {
         send "yes\r"
         set timeout -1
-        exp_continue
     } timeout {
 
     } -re . {
@@ -65,9 +69,9 @@ expect {
 }
 
 foreach file [glob -nocomplain ~/$uploads_folder/$file_name] {
-  file copy $file [file join ~/$uploaded_folder/.]
+  file copy -force -- $file [file join ~/$uploaded_folder/.]
   sleep 0.1
-  file delete $file
+  file delete -force -- $file
 }
 
 exit

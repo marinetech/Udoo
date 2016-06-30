@@ -1,4 +1,5 @@
-#!/usr/bin/expect  --
+#!/bin/bash
+
 # Copyright (c) 2016 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
@@ -28,45 +29,13 @@
 
 # Author: Filippo Campagnaro
 # email: campagn1@dei.unipd.it
-# place it in /usr/local/bin/upload_files.tcl
-# Breif description: script to upload files of an user
-set remote_user "pc104"
-set pass "pc104"
-set host "192.168.100.98"
-set uploads_folder "files2upload"
-set uploaded_folder "files_uploaded"
+# place it in /usr/local/sbin/ usr/local/bin/remove_all_sent
+# Breif description: script to erase all the upload files of all the users \
+# placed in the default folders
 
-if {$argc != 1} {
-    puts "The script requires one input:"
-    puts "- user_name"
-    puts "example: ./uwcbr.tcl udooer"
-    puts "Please try again."
-    return
-} else {
-    set user_name [lindex $argv 0]
-}
-
-spawn bash -c "scp -r /home/$user_name/$uploads_folder/* $remote_user@${host}:."
-expect {           
-    -re {(.*)password:} {
-        send "$pass\r"
-	exp_continue
-    } -re {(.*)yes/no\)?} {
-        send "yes\r"
-        set timeout -1
-    } timeout {
-
-    } -re . {
-        exp_continue
-    } eof {
-      
-    }
-}
-
-foreach file [glob -nocomplain /home/$user_name/$uploads_folder/*] {
-  file copy -force -- $file [file join /home/$user_name/$uploaded_folder/.]
-  sleep 0.1
-  file delete -force -- $file
-}
-
-exit
+users_list=$(ls /home/)
+files_folder='files_uploaded'
+for user_i in $users_list
+do
+	rm -r /home/$user_i/$files_folder/*
+done
