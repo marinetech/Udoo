@@ -19,12 +19,18 @@ import random
 # CONNECTION with the node
 
 TCP_IP = "192.168.100.98"
-TCP_IP = "127.0.0.1"
+#TCP_IP = "127.0.0.1"
 TCP_PORT = 44444
 BUFFER_SIZE = 64
 DATA_BUFFER_SIZE = 64
 
 FILENAMENOISE = "noise.wav"
+
+out_folder = "."
+
+if len(sys.argv) == 2:
+	out_folder = sys.argv[1]
+print "output folder = ", out_folder
 
 myPID = os.getpid()
 print "HI ", myPID, "!!"
@@ -50,7 +56,7 @@ try:
 	print "rec.py: reqRTDATA"
 	bridge.reqRTData(1, hydrop_list, round(time.time() + 2), 22)
 	time.sleep(1)
-	rec.record_stream(time.strftime('%d.%m.%Y %H:%M:%S', time.localtime()), 22, "out")
+	rec.record_stream(time.strftime('%d.%m.%Y %H:%M:%S', time.localtime()), 22, out_folder)
 	bridge.reqDeleteAllRec()
 	time.sleep(0.1)
 	bridge.reqDeleteAllSent()

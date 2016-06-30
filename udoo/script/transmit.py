@@ -18,7 +18,7 @@ import random
 # CONNECTION with the node
 
 TCP_IP = "192.168.100.98"
-TCP_IP = "127.0.0.1"
+#TCP_IP = "127.0.0.1"
 TCP_PORT = 44444
 BUFFER_SIZE = 64
 DATA_BUFFER_SIZE = 64
