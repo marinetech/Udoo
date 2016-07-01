@@ -5,6 +5,8 @@ Python library that lets the user generate waveforms and write them to a file to
 In order to run the libraries, the user needs to install the scipy and matplotlib Python packages.
 
 `apt-get install python-matplotlib`
+sudo apt-get install python-scipy
+pip install scipy
 
 accepting the dependencies, also numpy and scipy will be installed.
 
