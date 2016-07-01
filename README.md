@@ -14,8 +14,8 @@ then follow the procedure and confirm
 sudo passwd udooer
 <new password>
 9) type:
-sudo cp Udoo/daemons/etc/network/interfaces etc/network/interfaces
-sudo cp Udoo/daemons/etc/rc.local etc/rc.local 
+sudo cp Udoo/daemons/etc/network/interfaces /etc/network/interfaces
+sudo cp Udoo/daemons/etc/rc.local /etc/rc.local 
 sudo cp Udoo/daemons/user/local/bin/* /usr/local/bin/.
 sudo cp Udoo/daemons/user/local/sbin/* /usr/local/sbin/.
 sudo cp -r Udoo/udoo/themosignal /usr/local/lib/python2.7/dist-packages/.
