@@ -23,3 +23,5 @@ sudo cp -r Udoo/udoo2node/udoo2no_pkg /usr/local/lib/python2.7/dist-packages/.
 sudo cp -r Udoo/udoo/script /home/themo_user/.
 sudo mkdir /home/themo_user/files2upload
 sudo mkdir /home/themo_user/files_uploaded
+sudo chown -R themo_user /home/themo_user/script/
+sudo chown -R themo_user /home/themo_user/f*
