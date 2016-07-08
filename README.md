@@ -7,7 +7,10 @@ Cointains the guide how to set the UDOO by scratch
 5) install the following software, after sudo apt-get update. The sudo password is udooer. This requires a while.
 sudo apt-get install expect ntp rsync python-matplotlib vim git daemontools daemontools-run python-scipy
 pip install scipy
-6) type git clone https://github.com/marinetech/Udoo.git
+6) type 
+git clone https://github.com/marinetech/Udoo.git
+if doesn't work due to server certificates, please type 
+export GIT_SSL_NO_VERIFY=1 and retry
 7) create a new user called themo_user with a searten password decided from the admin with no root privileges. To do that, type:
 adduser themo_user
 then follow the procedure and confirm
