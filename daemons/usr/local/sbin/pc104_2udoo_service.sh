@@ -35,16 +35,17 @@
 COMMON_LOG=/var/log/check_status
 port=55555
 rm $COMMON_LOG/check_off.log > /dev/null
+STATUS="ON"
 while true
 do
-	pc104_message=$(nc -l -p $port)
+	pc104_message=$(echo $STATUS | nc -l -p $port)
 	echo $pc104_message
 
 	#if getStatus
 	getStatus_flag=$(echo $pc104_message | grep getStatus)
 	if [ -n "$getStatus_flag" ]
 	then
-		echo "ON" | nc -l -p $port
+		echo $STATUS | nc -l -p $port
 	fi
 
 	# set date if date
@@ -88,6 +89,7 @@ do
 	then
 		# poweroff_procedure
 		echo "poweroff" > $COMMON_LOG/check_off.log
+		STATUS="poweroff"
 		sleep 10
 		sudo poweroff
 	fi

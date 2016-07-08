@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /usr/local/sbin/temper_daemon.sh

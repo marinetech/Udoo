@@ -17,8 +17,8 @@ if [ `date +"%Y"` -eq "1970" ]; then
 	date --set="2015-01-01"
 fi
 sudo ifconfig wlan0 down
-sudo pc104_2udoo_service.sh > /dev/null &
-sudo temper_daemon.sh > /dev/null &
+#sudo pc104_2udoo_service.sh > /dev/null &
+#sudo temper_daemon.sh > /dev/null &
 sudo upload_all.sh > /dev/null &
 exit 0
 

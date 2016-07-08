@@ -5,7 +5,7 @@ Cointains the guide how to set the UDOO by scratch
 3) place the sd card in the udoo neo, connect the udoo with an ethernet to you PC and to internet and power it on 
 4) login to it with login: udooer, pass: udooer
 5) install the following software, after sudo apt-get update. The sudo password is udooer. This requires a while.
-sudo apt-get install ntp python-matplotlib vim git python-scipy
+sudo apt-get install expect ntp rsync python-matplotlib vim git daemontools daemontools-run python-scipy
 pip install scipy
 6) type git clone https://github.com/marinetech/Udoo.git
 7) create a new user called themo_user with a searten password decided from the admin with no root privileges. To do that, type:
@@ -22,6 +22,8 @@ sudo cp Udoo/daemons/usr/local/sbin/* /usr/local/sbin/.
 sudo cp -r Udoo/udoo/themosignal /usr/local/lib/python2.7/dist-packages/.
 sudo cp -r Udoo/udoo2node/ud2no_pkg /usr/local/lib/python2.7/dist-packages/.
 sudo cp -r Udoo/udoo/script /home/themo_user/.
+sudo cp -r Udoo/daemons/etc/service/* /etc/service/*
+sudo chmod -R 1755 /etc/service
 sudo mkdir /home/themo_user/files2upload
 sudo mkdir /home/themo_user/files_uploaded
 sudo chown -R themo_user /home/themo_user/script/

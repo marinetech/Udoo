@@ -36,6 +36,7 @@ set host "192.168.100.98"
 set uploads_folder "files2upload"
 set uploaded_folder "files_uploaded"
 set home_folder "~"
+set timeout 10
 
 if {$argc < 1} {
     puts "The script requires at least one input:"
@@ -55,10 +56,12 @@ spawn bash -c "scp -r ~/$uploads_folder/$file_name $remote_user@${host}:."
 expect {           
     -re {(.*)password:} {
         send "$pass\r"
-	exp_continue
+        set timeout -1
+	    exp_continue
     } -re {(.*)yes/no\)?} {
         send "yes\r"
         set timeout -1
+        exp_continue
     } timeout {
 
     } -re . {
