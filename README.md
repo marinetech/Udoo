@@ -25,7 +25,7 @@ sudo cp Udoo/daemons/usr/local/sbin/* /usr/local/sbin/.
 sudo cp -r Udoo/udoo/themosignal /usr/local/lib/python2.7/dist-packages/.
 sudo cp -r Udoo/udoo2node/ud2no_pkg /usr/local/lib/python2.7/dist-packages/.
 sudo cp -r Udoo/udoo/script /home/themo_user/.
-sudo cp -r Udoo/daemons/etc/service/* /etc/service/*
+sudo cp -r Udoo/daemons/etc/service/* /etc/service/.
 sudo chmod -R 1755 /etc/service
 sudo mkdir /home/themo_user/files2upload
 sudo mkdir /home/themo_user/files_uploaded
