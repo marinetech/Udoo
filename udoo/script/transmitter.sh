@@ -10,6 +10,6 @@ SCRIPT_NAME=transmit.py
 cp $CURRENT_FOLDER/$LOG_NAME $UPLOAD_FOLDER/$LOG_NAME
 /bin/sleep 1
 rm $CURRENT_FOLDER/$LOG_NAME
-upload_spec_file.tcl $LOG_NAME themo_user
+/usr/local/bin/upload_spec_file.tcl $LOG_NAME themo_user
 #upload_all.sh
 
