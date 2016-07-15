@@ -30,9 +30,10 @@
 # email: campagn1@dei.unipd.it
 # place it in /usr/local/bin/upload_spec_file.tcl
 # Breif description: script to upload a file given the name
-set remote_user "pc104"
-set pass "pc104"
-set host "192.168.100.98"
+set remote_user "service"
+set pass "tabsbuoy"
+set host "165.91.230.239"
+set remote_folder "/home/data/averaged/"
 set uploads_folder "files2upload"
 set uploaded_folder "files_uploaded"
 set home_folder "~"
@@ -52,7 +53,7 @@ if {$argc < 1} {
     }
 }
 
-spawn bash -c "scp -r ~/$uploads_folder/$file_name $remote_user@${host}:."
+spawn bash -c "scp -r ~/$uploads_folder/$file_name $remote_user@${host}:${remote_folder}."
 expect {           
     -re {(.*)password:} {
         send "$pass\r"

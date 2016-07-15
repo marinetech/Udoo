@@ -1,7 +1,7 @@
 UPLOAD_FOLDER=/home/themo_user/files2upload
 CURRENT_FOLDER=/home/themo_user/script
 cd $CURRENT_FOLDER
-LOG_NAME=transmitter$(/bin/date +%s)_log.out
+LOG_NAME=transmitter$(/bin/hostname)_$(/bin/date +%s)_log.out
 SCRIPT_NAME=transmit.py
 /bin/date >> $CURRENT_FOLDER/$LOG_NAME 2>&1
 /bin/sleep 1

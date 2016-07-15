@@ -1,7 +1,7 @@
 LOG_FOLDER=/home/themo_user/files2upload
 CURRENT_FOLDER=/home/themo_user/script
 cd $CURRENT_FOLDER
-LOG_NAME=receiver$(/bin/date +%s)_log.out
+LOG_NAME=receiver$(/bin/hostname)_$(/bin/date +%s)_log.out
 SCRIPT_NAME=receiver.py
 /bin/date >> $CURRENT_FOLDER/$LOG_NAME
 /bin/sleep 1

@@ -30,9 +30,10 @@
 # email: campagn1@dei.unipd.it
 # place it in /usr/local/bin/upload_files.tcl
 # Breif description: script to upload files of an user
-set remote_user "pc104"
-set pass "pc104"
-set host "192.168.100.98"
+set remote_user "service"
+set pass "tabsbuoy"
+set host "165.91.230.239"
+set remote_folder "/home/data/mainland/"
 set uploads_folder "files2upload"
 set uploaded_folder "files_uploaded"
 set timeout 10
@@ -47,7 +48,12 @@ if {$argc != 1} {
     set user_name [lindex $argv 0]
 }
 
-spawn bash -c "/usr/bin/scp -r /home/$user_name/$uploads_folder/* $remote_user@${host}:."
+set curr_date [eval exec /bin/date +%s]
+set my_name [eval exec /bin/hostname]
+set my_id [eval exec /usr/bin/hostid]
+exec /usr/bin/7z a /home/$user_name/$uploads_folder/${my_name}${my_id}_$curr_date.7z /home/$user_name/$uploads_folder/
+
+spawn bash -c "/usr/bin/scp /home/$user_name/$uploads_folder/*.7z $remote_user@${host}:${remote_folder}."
 expect {           
     -re ".*password:" {
         send "$pass\r"

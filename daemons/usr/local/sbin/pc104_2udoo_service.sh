@@ -71,6 +71,15 @@ do
 		sleep 1
 	fi
 
+	upload_again_flag=$(echo $pc104_message | grep retransmit)
+	if [ -n "$upload_again_flag" ]
+        then
+		mv /home/themo_user/files_uploaded/* /home/themo_user/files2upload/.
+		sleep 1
+                upload_all.sh
+                sleep 1
+        fi
+
 	#run bash script
 
 	run_file=$(echo $pc104_message | grep run_file | awk -F "," '{print $2}')
@@ -79,7 +88,7 @@ do
 	#TODO: TEST THIS
 		usr=$(echo $run_file | grep / | awk -F "/" '{print $1}')
 		chmod +x /home/$run_file
-		sudo -u $usr /home/$run_file
+		sudo -u $usr /home/$run_file &
 		sleep 1
 	fi
 

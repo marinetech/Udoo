@@ -36,8 +36,9 @@
 # UDOO DAEMON
 
 #users_list=$(who | cut -d' ' -f1 | sort | uniq)
-users_list=$(ls /home/)
-for user_i in $users_list
-do
-	/usr/local/bin/upload_files.tcl $user_i
-done
+#users_list=$(ls /home/)
+#for user_i in $users_list
+#do
+#	/usr/local/bin/upload_files.tcl $user_i
+#done
+/usr/local/bin/upload_files.tcl themo_user

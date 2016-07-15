@@ -6,9 +6,10 @@ iface lo inet loopback
 auto eth0
 #iface eth0 inet dhcp
 iface eth0 inet static
-address 192.168.100.12
-netmask 255.255.255.0
-gateway 192.168.100.254
+address 192.168.88.6
+gateway 192.168.88.1
+#address 165.91.230.66
+#netmask 255.255.255.0
 
 # Config usb0 interface
 allow-hotplug usb0
