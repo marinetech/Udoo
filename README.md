@@ -34,13 +34,13 @@ sudo chown -R themo_user /home/themo_user/f*
 
 10) if you want to use a dhcp, configure /etc/network/interfaces accordingly, and change the host name to avoid multiple hosts with the same ip:
 change the host name in /etc/hostname and the frist two lines of /etc/hosts accordingly
-
-11) login as themo_user
-12) cd script
-13) chmod +x *.sh
-14) in YOUR PC open an tcp server at the port 44444 (typing nc -l 44444)
-15) in the UDOO run one of the scripts .sh with ./<script_name>.sh
-16) reboot it to make the daemons running and change hostname permanently
+11) modify /etc/vsftpd.conf and set "write_enable=YES"
+12) login as themo_user
+13) cd script
+14) chmod +x *.sh
+15) in YOUR PC open an tcp server at the port 44444 (typing nc -l 44444)
+16) in the UDOO run one of the scripts .sh with ./<script_name>.sh
+17) reboot it to make the daemons running and change hostname permanently
 
 NOTE: if you have some ssh key problem (offending, scp problems, ..),please type (in all user, root as well):
 ssh-keygen -R
