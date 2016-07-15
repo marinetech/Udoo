@@ -5,7 +5,7 @@ Cointains the guide how to set the UDOO by scratch
 3) place the sd card in the udoo neo, connect the udoo with an ethernet to you PC and to internet and power it on 
 4) login to it with login: udooer, pass: udooer
 5) install the following software, after sudo apt-get update. The sudo password is udooer. This requires a while.
-sudo apt-get install expect ntp rsync python-matplotlib vim git daemontools daemontools-run python-scipy p7zip-full sox
+sudo apt-get install expect ntp rsync python-matplotlib vim git daemontools daemontools-run python-scipy p7zip-full sox vsftpd
 pip install scipy
 6) type 
 git clone https://github.com/marinetech/Udoo.git
